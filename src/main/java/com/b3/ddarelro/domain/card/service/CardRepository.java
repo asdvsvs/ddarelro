@@ -1,5 +1,5 @@
-package com.b3.ddarelro.domain.card.service;
-
-public class CardRepository {
-
-}
+//package com.b3.ddarelro.domain.card.service;
+//
+//public class CardRepository {
+//
+//}
