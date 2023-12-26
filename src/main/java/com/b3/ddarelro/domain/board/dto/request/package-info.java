@@ -1,0 +1,1 @@
+package com.b3.ddarelro.domain.board.dto.request;
