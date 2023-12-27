@@ -3,10 +3,14 @@ package com.b3.ddarelro.domain.comment.service;
 import com.b3.ddarelro.domain.card.entity.Card;
 import com.b3.ddarelro.domain.card.service.CardService;
 import com.b3.ddarelro.domain.comment.dto.request.CommentCreateReq;
+import com.b3.ddarelro.domain.comment.dto.request.CommentUpdateReq;
 import com.b3.ddarelro.domain.comment.dto.response.CommentCreateRes;
+import com.b3.ddarelro.domain.comment.dto.response.CommentUpdateRes;
 import com.b3.ddarelro.domain.comment.entity.Comment;
+import com.b3.ddarelro.domain.comment.exception.CommentErrorCode;
 import com.b3.ddarelro.domain.comment.repository.CommentRepository;
 import com.b3.ddarelro.domain.user.entity.User;
+import com.b3.ddarelro.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,4 +32,22 @@ public class CommentService {
         return CommentCreateRes.builder().id(comment.getId()).content(comment.getContent()).build();
     }
 
+    public CommentUpdateRes updateComment(Long commentsId, CommentUpdateReq req, Long userId) {
+        Comment comment = getUserComment(commentsId, userId);
+        comment.update(req.content());
+        return CommentUpdateRes.builder().id(comment.getId()).content(comment.getContent()).build();
+    }
+
+    private Comment findComment(Long commentId) {
+        return commentRepository.findById(commentId)
+            .orElseThrow(() -> new GlobalException(CommentErrorCode.NOT_FOUND));
+    }
+
+    private Comment getUserComment(Long commentId, Long userId) {
+        Comment comment = findComment(commentId);
+        if (!comment.getUser().getId().equals(userId)) {
+            throw new GlobalException(CommentErrorCode.INVALID_USER);
+        }
+        return comment;
+    }
 }
