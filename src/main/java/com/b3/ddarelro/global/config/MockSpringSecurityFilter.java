@@ -1,23 +1,21 @@
 package com.b3.ddarelro.global.config;
 
-import jakarta.servlet.Filter;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.FilterConfig;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
-import jakarta.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
+import java.io.*;
+import org.springframework.security.core.*;
+import org.springframework.security.core.context.*;
 
 public class MockSpringSecurityFilter implements Filter {
+
     @Override
-    public void init(FilterConfig filterConfig) {}
+    public void init(FilterConfig filterConfig) {
+    }
 
     @Override
     public void doFilter(
-        ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
+        ServletRequest req, ServletResponse res, FilterChain chain)
+        throws IOException, ServletException {
         SecurityContextHolder.getContext()
             .setAuthentication((Authentication) ((HttpServletRequest) req).getUserPrincipal());
         chain.doFilter(req, res);
