@@ -12,21 +12,20 @@ public class Handler {
     @ExceptionHandler(GlobalException.class)
     public ResponseEntity<ErrorResponse> handle(GlobalException e) {
         ErrorResponse errorResponse = ErrorResponse.builder()
-            .status(e.getSampleErrorCode().getHttpStatus().value())
+            .status(e.getErrorCode().getHttpStatus().value())
             .build();
-        errorResponse.addMessage(e.getSampleErrorCode().getMessage());
-        return ResponseEntity.status(e.getSampleErrorCode().getHttpStatus()).body(errorResponse);
+        errorResponse.addMessage(e.getErrorCode().getMessage());
+        return ResponseEntity.status(e.getErrorCode().getHttpStatus()).body(errorResponse);
     }
 
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException
-        (MethodArgumentNotValidException e)
-    {
+        (MethodArgumentNotValidException e) {
         ArrayList<String> errors = new ArrayList<>();
         e.getAllErrors().forEach(error -> errors.add(error.getDefaultMessage()));
 
-        SampleErrorCode errorCode = SampleErrorCode.VALIDATION_ERROR;
+        ErrorCode errorCode = SampleErrorCode.VALIDATION_ERROR;
         ErrorResponse errorResponse = ErrorResponse.builder()
             .status(errorCode.getHttpStatus().value())
             .messages(errors)
