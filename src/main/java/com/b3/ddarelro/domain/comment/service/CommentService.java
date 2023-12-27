@@ -2,6 +2,8 @@ package com.b3.ddarelro.domain.comment.service;
 
 import com.b3.ddarelro.domain.card.entity.Card;
 import com.b3.ddarelro.domain.card.service.CardService;
+import com.b3.ddarelro.domain.comment.controller.CommentListReq;
+import com.b3.ddarelro.domain.comment.controller.CommentListRes;
 import com.b3.ddarelro.domain.comment.dto.request.CommentCreateReq;
 import com.b3.ddarelro.domain.comment.dto.request.CommentUpdateReq;
 import com.b3.ddarelro.domain.comment.dto.response.CommentCreateRes;
@@ -12,6 +14,7 @@ import com.b3.ddarelro.domain.comment.exception.CommentErrorCode;
 import com.b3.ddarelro.domain.comment.repository.CommentRepository;
 import com.b3.ddarelro.domain.user.entity.User;
 import com.b3.ddarelro.global.exception.GlobalException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +47,16 @@ public class CommentService {
         Comment comment = getUserComment(commentId, userId);
         commentRepository.delete(comment);
         return CommentDeleteRes.builder().message("댓글 삭제 성공").build();
+    }
+
+    public List<CommentListRes> getComments(CommentListReq req) {
+        List<Comment> comments = commentRepository.findAllByCardIdOrderByCreatedAtDesc(req.cardId());
+        return comments.stream()
+            .map(comment -> CommentListRes.builder()
+                .id(comment.getId())
+                .content(comment.getContent())
+                .build())
+            .toList();
     }
 
     private Comment findComment(Long commentId) {
