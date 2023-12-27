@@ -1,21 +1,18 @@
 package com.b3.ddarelro.domain.board.dto.response;
 
 import com.b3.ddarelro.domain.board.entity.Board;
-import com.b3.ddarelro.domain.board.entity.ColorEnum;
-import lombok.Getter;
+import com.b3.ddarelro.domain.board.entity.Color;
 
-@Getter
-public class BoardGetResDto {
+public class BoardPriviewResDto {
 
     private Long id;
-    private String description;
     private String name;
-    private ColorEnum color;
+    private Color color;
 
-    public BoardGetResDto(Board board){
+    public BoardPriviewResDto(Board board){
         this.id = board.getId();
-        this.description = board.getDescription();
         this.name = board.getName();
         this.color = board.getColor();
     }
+
 }
