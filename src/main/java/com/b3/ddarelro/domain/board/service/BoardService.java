@@ -10,6 +10,7 @@ import com.b3.ddarelro.domain.board.dto.response.BoardInviteResDto;
 import com.b3.ddarelro.domain.board.dto.response.BoardPriviewResDto;
 import com.b3.ddarelro.domain.board.entity.Board;
 import com.b3.ddarelro.domain.board.repository.BoardRepository;
+import com.b3.ddarelro.domain.column.service.ColumnService;
 import com.b3.ddarelro.domain.user.entity.User;
 import com.b3.ddarelro.domain.userboard.entity.BoardAuthority;
 import com.b3.ddarelro.domain.userboard.entity.UserBoard;
@@ -26,8 +27,8 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
     private final UserBoardRepository userBoardRepository;
-    //private final UserService userService;
-
+    private final UserService userService;
+    private final ColumnService columnService;
 
     public BoardCreateResDto createBoard(User user, BoardCreateReqDto reqDto){
 
@@ -81,6 +82,7 @@ public class BoardService {
         validteUserAuthority(founddUser,foundBoard);
 
         foundBoard.deleteBoardState(true);
+        columnService.deleteAllColumn(boardId);
         return new BoardDeleteResDto("삭제가 완료되었습니다.");
     }
 
@@ -143,15 +145,10 @@ public class BoardService {
     public BoardDropResDto dropMember(User user, Long boardId, Long dropUserId){
 
         validateInviteOwn(user,dropUserId); // 자기자신을 초대하는지 체크
-
         User founddUser = userService.findUser(user.getId());
-
         User dropUser = userService.findUser(dropUserId);
-
         Board foundBoard = findBoard(boardId);
-
         validteUserAuthority(founddUser,foundBoard);
-
 
         validateMember(dropUser,foundBoard); //탈퇴할 사용자가 멤버에 있는지 확인
 
@@ -171,7 +168,7 @@ public class BoardService {
     }
 
     private void validteUserAuthority(User foundUser,Board foundBoard) {
-
+        // 해당 보드,유저를 가지고있는 userBoard확인 후 권한을 가지고있는 유저인지 체크
         validateMember(foundUser,foundBoard);
         UserBoard foundUserBoard = userBoardRepository.findByUserAndBoard(foundUser,foundBoard).get();
         if(foundUserBoard.getBoardAuthority() != BoardAuthority.ADMIN){
@@ -179,13 +176,13 @@ public class BoardService {
         }
     }
 
-    private void validateDeleted(Board board){
+    private void validateDeleted(Board board){ //삭제된 보드인지 확인
         if(board.getDeleted().equals(true)){
             throw new IllegalArgumentException("이미 삭제된 보드입니다.");
         }
     }
 
-    private void validateMember(User user, Board board){
+    private void validateMember(User user, Board board){ // 같은 user, board를 가지고있는 userboard인지 확인
         if(!userBoardRepository.existsByUserAndBoard(user,board)){
             throw new IllegalArgumentException("해당유저는 현재 보드에 속한 멤버가 아닙니다.");
         }
@@ -193,13 +190,13 @@ public class BoardService {
     }
 
 
-    private void validateInviteOwn(User user, Long userId){
+    private void validateInviteOwn(User user, Long userId){ //자기 자신을 초대 및 탈퇴 시키는지 확인
         if(user.getId().equals(userId)){
             throw new IllegalArgumentException("자기 자신을 초대 및 탈퇴시킬 수 없습니다.");
         }
     }
 
-    private void validateExistedMember(User user, Board board){
+    private void validateExistedMember(User user, Board board){ // 이미 가입되어있느 멤버인지 확인
         if(userBoardRepository.existsByUserAndBoard(user,board)){
             throw new IllegalArgumentException("이미 초대된 멤버입니다.");
         }
