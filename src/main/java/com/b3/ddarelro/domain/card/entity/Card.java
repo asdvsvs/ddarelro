@@ -18,9 +18,9 @@ public class Card extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name = "card_id", nullable = false)
-    private String title;
+    private String name;
     @Column(nullable = false)
-    private String content;
+    private String description;
     @Column(nullable = false)
     private String color;
 
@@ -31,9 +31,10 @@ public class Card extends BaseEntity {
     private List<Comment> commentList;
 
     @Builder
-    public Card(String title, String content, String color, User user, List<Comment> commentList) {
-        this.title = title;
-        this.content = content;
+    public Card(String name, String description, String color, User user,
+        List<Comment> commentList) {
+        this.name = name;
+        this.description = description;
         this.color = color;
         this.user = user;
         this.commentList = commentList;
