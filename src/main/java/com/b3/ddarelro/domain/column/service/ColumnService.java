@@ -71,13 +71,17 @@ public class ColumnService {
             .build();
     }
 
+    @Transactional
     public ColumnDeleteRes deleteColumn(Long columnId, ColumnDeleteReq req, Long userId) {
         Board board = getBoardAndLeaderCheck(req.boardId(), userId);
 
         Column column = findColumn(columnId);
-        columnRepository.delete(column);
+        column.delete();
 
-        return ColumnDeleteRes.builder().build();
+        return ColumnDeleteRes.builder()
+            .title(column.getTitle())
+            .deleted(column.getDeleted())
+            .build();
     }
 
     public Column findColumn(Long columnId) {
