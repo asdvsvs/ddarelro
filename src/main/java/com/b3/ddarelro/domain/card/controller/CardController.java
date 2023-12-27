@@ -3,6 +3,7 @@ package com.b3.ddarelro.domain.card.controller;
 import com.b3.ddarelro.domain.card.dto.request.*;
 import com.b3.ddarelro.domain.card.dto.response.*;
 import com.b3.ddarelro.domain.card.service.*;
+import java.util.*;
 import lombok.*;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -16,12 +17,18 @@ public class CardController {
 
 
     @PostMapping
-    public ResponseEntity<CardCreateResDto> createCard(@RequestBody CardCreateReqDto reqDto) {
+    public ResponseEntity<CardCreateRes> createCard(@RequestBody CardCreateReq reqDto) {
 
-        CardCreateResDto resDto = cardService.createCard(reqDto);
+        CardCreateRes resDto = cardService.createCard(reqDto);
         return ResponseEntity.status(201).body(resDto);
     }
+
     //TODO 카드 목록 조회
+    @GetMapping
+    public ResponseEntity<List<CardListRes>> getCardList() {
+        List<CardListRes> resListDto = cardService.getCardList();
+        return ResponseEntity.ok().body(resListDto);
+    }
 
     //TODO 카드 단일 조회
 

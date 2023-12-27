@@ -6,30 +6,29 @@ import lombok.*;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CardCreateResDto {
+public class CardListRes {
 
-    private String title;
+    private String name;
     //private String username;
-    private String content;
+    private String description;
     private String color;
     private LocalDateTime createdAt;
 
     @Builder
-    public CardCreateResDto(String title, String content, String color, LocalDateTime createdAt) {
-        this.title = title;
-        this.content = content;
+    public CardListRes(String name, String description, String color, LocalDateTime createdAt) {
+        this.name = name;
+        this.description = description;
         this.color = color;
         this.createdAt = createdAt;
     }
 
-    public static CardCreateResDto formingWith(Card card) {
-        return CardCreateResDto.builder()
-            .title(card.getTitle())
+    public static CardListRes formWith(Card card) {
+        return CardListRes.builder()
+            .name(card.getName())
             //.username(card.getUser().getUsername())
-            .content(card.getContent())
+            .description(card.getDescription())
             .color(card.getColor())
             .createdAt(card.getCreatedAt())
             .build();
     }
-
 }
