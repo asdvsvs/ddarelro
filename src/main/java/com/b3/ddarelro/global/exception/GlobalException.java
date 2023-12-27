@@ -5,9 +5,9 @@ import lombok.Getter;
 @Getter
 public class GlobalException extends RuntimeException{
 
-    SampleErrorCode sampleErrorCode;
+    ErrorCode errorCode;
 
-    public GlobalException(SampleErrorCode sampleErrorCode) {
-        this.sampleErrorCode = sampleErrorCode;
+    public GlobalException(ErrorCode errorCode) {
+        this.errorCode = errorCode;
     }
 }
