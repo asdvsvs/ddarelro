@@ -3,9 +3,11 @@ package com.b3.ddarelro.domain.column.service;
 import com.b3.ddarelro.domain.board.entity.Board;
 import com.b3.ddarelro.domain.board.service.BoardService;
 import com.b3.ddarelro.domain.column.dto.request.ColumnCreateReq;
+import com.b3.ddarelro.domain.column.dto.request.ColumnDeleteReq;
 import com.b3.ddarelro.domain.column.dto.request.ColumnGetReq;
 import com.b3.ddarelro.domain.column.dto.request.ColumnUpdateReq;
 import com.b3.ddarelro.domain.column.dto.response.ColumnCreateRes;
+import com.b3.ddarelro.domain.column.dto.response.ColumnDeleteRes;
 import com.b3.ddarelro.domain.column.dto.response.ColumnUpdateRes;
 import com.b3.ddarelro.domain.column.dto.response.ColumnsGetRes;
 import com.b3.ddarelro.domain.column.entity.Column;
@@ -27,10 +29,8 @@ public class ColumnService {
     private final UserService userService;
 
     public ColumnCreateRes createColumn(ColumnCreateReq req, Long userId) {
-        Board board = boardService.findBoard(req.boardId());
-        User user = userService.findUser(userId);
+        Board board = getBoardAndLeaderCheck(req.boardId(), userId);
         Long priority = columnRepository.count() + 1;
-        validateLeader(board, user);
 
         Column column = columnRepository.save(Column.builder()
             .title(req.title())
@@ -61,10 +61,8 @@ public class ColumnService {
 
     @Transactional
     public ColumnUpdateRes updateColumn(Long columnId, ColumnUpdateReq req, Long userId) {
-        Board board = boardService.findBoard(req.boardId());
-        User user = userService.findUser(userId);
-        validateLeader(board, user);
-        
+        Board board = getBoardAndLeaderCheck(req.boardId(), userId);
+
         Column column = findColumn(columnId);
         column.update(req.title());
 
@@ -73,9 +71,25 @@ public class ColumnService {
             .build();
     }
 
+    public ColumnDeleteRes deleteColumn(Long columnId, ColumnDeleteReq req, Long userId) {
+        Board board = getBoardAndLeaderCheck(req.boardId(), userId);
+
+        Column column = findColumn(columnId);
+        columnRepository.delete(column);
+
+        return ColumnDeleteRes.builder().build();
+    }
+
     public Column findColumn(Long columnId) {
         return columnRepository.findById(columnId)
             .orElseThrow(() -> new GlobalException(ColumnErrorCode.NOT_FOUND));
+    }
+
+    private Board getBoardAndLeaderCheck(Long boardId, Long userId) {
+        Board board = boardService.findBoard(boardId);
+        User user = userService.findUser(userId);
+        validateLeader(board, user);
+        return board;
     }
 
     private void validateLeader(Board board, User user) {
