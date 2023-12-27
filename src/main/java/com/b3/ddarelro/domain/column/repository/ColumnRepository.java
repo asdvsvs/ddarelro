@@ -7,6 +7,9 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface ColumnRepository extends JpaRepository<Column, Long> {
 
-    @Query("select c from Column c join fetch c.board where c.board = :id order by c.priority")
-    List<Column> findAllByBoardId(Long id);
+    @Query("select c from Column c "
+        + "join fetch c.board b "
+        + "where b.id = :boardId and c.deleted = false "
+        + "order by c.priority")
+    List<Column> findAllByBoardId(Long boardId);
 }
