@@ -12,4 +12,9 @@ public interface ColumnRepository extends JpaRepository<Column, Long> {
         + "where b.id = :boardId and c.deleted = false "
         + "order by c.priority")
     List<Column> findAllByBoardId(Long boardId);
+
+    @Query("select count(*) from Column c "
+        + "join c.board b "
+        + "where b.id = :boardId")
+    Long countByBoardId(Long boardId);
 }

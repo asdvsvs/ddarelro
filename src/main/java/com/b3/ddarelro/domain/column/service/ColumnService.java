@@ -30,7 +30,7 @@ public class ColumnService {
 
     public ColumnCreateRes createColumn(ColumnCreateReq req, Long userId) {
         Board board = getBoardAndLeaderCheck(req.boardId(), userId);
-        Long priority = columnRepository.count() + 1;
+        Long priority = columnRepository.countByBoardId(req.boardId()) + 1;
 
         Column column = columnRepository.save(Column.builder()
             .title(req.title())
