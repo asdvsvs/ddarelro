@@ -5,7 +5,6 @@ import com.b3.ddarelro.domain.card.dto.response.*;
 import com.b3.ddarelro.domain.card.entity.*;
 import com.b3.ddarelro.domain.card.exception.*;
 import com.b3.ddarelro.domain.card.repository.*;
-import com.b3.ddarelro.domain.comment.service.*;
 import com.b3.ddarelro.global.exception.*;
 import java.util.*;
 import java.util.stream.*;
@@ -17,7 +16,7 @@ import org.springframework.stereotype.*;
 public class CardService {
 
     private final CardRepository cardRepository;
-    private final CommentService commentService;
+//    private final UserService userService;
 
     public CardCreateRes createCard(CardCreateReq reqDto) {
 //        columnService.findColumn(reqDto.getColumnId()).orElseThrow(() -> new GlobalException());
@@ -45,6 +44,13 @@ public class CardService {
         Card card = findCard(cardId);
 
         return CardRes.formWith(card);
+    }
+
+    public CardModifyRes modifyCard(Long cardId, CardModifyReq reqDto) {
+        Card card = findCard(cardId);
+        //findUser(user, card);
+        card.modifyCard(reqDto);
+        return CardModifyRes.formWith(card);
     }
 
     public Card findCard(Long cardId) {
