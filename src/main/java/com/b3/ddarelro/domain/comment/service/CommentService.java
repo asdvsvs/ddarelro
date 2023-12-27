@@ -2,8 +2,8 @@ package com.b3.ddarelro.domain.comment.service;
 
 import com.b3.ddarelro.domain.card.entity.Card;
 import com.b3.ddarelro.domain.card.service.CardService;
-import com.b3.ddarelro.domain.comment.controller.CommentListReq;
-import com.b3.ddarelro.domain.comment.controller.CommentListRes;
+import com.b3.ddarelro.domain.comment.dto.CommentListReq;
+import com.b3.ddarelro.domain.comment.dto.CommentListRes;
 import com.b3.ddarelro.domain.comment.dto.request.CommentCreateReq;
 import com.b3.ddarelro.domain.comment.dto.request.CommentUpdateReq;
 import com.b3.ddarelro.domain.comment.dto.response.CommentCreateRes;
