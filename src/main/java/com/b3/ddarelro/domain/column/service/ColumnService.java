@@ -81,8 +81,12 @@ public class ColumnService {
     }
 
     public Column findColumn(Long columnId) {
-        return columnRepository.findById(columnId)
+        Column column = columnRepository.findById(columnId)
             .orElseThrow(() -> new GlobalException(ColumnErrorCode.NOT_FOUND));
+        if (column.getDeleted()) {
+            throw new GlobalException(ColumnErrorCode.IS_DELETED);
+        }
+        return column;
     }
 
     private Board getBoardAndLeaderCheck(Long boardId, Long userId) {
