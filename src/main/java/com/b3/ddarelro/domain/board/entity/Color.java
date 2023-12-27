@@ -3,7 +3,7 @@ package com.b3.ddarelro.domain.board.entity;
 import lombok.Getter;
 
 @Getter
-public enum ColorEnum {
+public enum Color {
 
     RED("빨간색"),
     BLACK("검정색"),
@@ -13,7 +13,7 @@ public enum ColorEnum {
     GREEN("초록색");
 
     private final String backgroundColor;
-    ColorEnum(String backgroundColor) {
+    Color(String backgroundColor) {
         this.backgroundColor = backgroundColor;
     }
 
