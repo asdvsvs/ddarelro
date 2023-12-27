@@ -42,4 +42,8 @@ public class Column extends BaseEntity {
         this.deleted = deleted != null ? deleted : false;
         this.board = board;
     }
+
+    public void update(String title) {
+        this.title = title;
+    }
 }

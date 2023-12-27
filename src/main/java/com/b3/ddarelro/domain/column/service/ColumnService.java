@@ -4,7 +4,9 @@ import com.b3.ddarelro.domain.board.entity.Board;
 import com.b3.ddarelro.domain.board.service.BoardService;
 import com.b3.ddarelro.domain.column.dto.request.ColumnCreateReq;
 import com.b3.ddarelro.domain.column.dto.request.ColumnGetReq;
+import com.b3.ddarelro.domain.column.dto.request.ColumnUpdateReq;
 import com.b3.ddarelro.domain.column.dto.response.ColumnCreateRes;
+import com.b3.ddarelro.domain.column.dto.response.ColumnUpdateRes;
 import com.b3.ddarelro.domain.column.dto.response.ColumnsGetRes;
 import com.b3.ddarelro.domain.column.entity.Column;
 import com.b3.ddarelro.domain.column.exception.ColumnErrorCode;
@@ -14,6 +16,7 @@ import com.b3.ddarelro.global.exception.GlobalException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -54,6 +57,25 @@ public class ColumnService {
 
         return columns.stream().map(column -> ColumnsGetRes.builder()
             .title(column.getTitle()).build()).toList();
+    }
+
+    @Transactional
+    public ColumnUpdateRes updateColumn(Long columnId, ColumnUpdateReq req, Long userId) {
+        Board board = boardService.findBoard(req.boardId());
+        User user = userService.findUser(userId);
+        validateLeader(board, user);
+        
+        Column column = findColumn(columnId);
+        column.update(req.title());
+
+        return ColumnUpdateRes.builder()
+            .title(column.getTitle())
+            .build();
+    }
+
+    public Column findColumn(Long columnId) {
+        return columnRepository.findById(columnId)
+            .orElseThrow(() -> new GlobalException(ColumnErrorCode.NOT_FOUND));
     }
 
     private void validateLeader(Board board, User user) {
