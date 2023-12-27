@@ -5,6 +5,7 @@ import com.b3.ddarelro.domain.card.service.CardService;
 import com.b3.ddarelro.domain.comment.dto.request.CommentCreateReq;
 import com.b3.ddarelro.domain.comment.dto.request.CommentUpdateReq;
 import com.b3.ddarelro.domain.comment.dto.response.CommentCreateRes;
+import com.b3.ddarelro.domain.comment.dto.response.CommentDeleteRes;
 import com.b3.ddarelro.domain.comment.dto.response.CommentUpdateRes;
 import com.b3.ddarelro.domain.comment.entity.Comment;
 import com.b3.ddarelro.domain.comment.exception.CommentErrorCode;
@@ -32,10 +33,17 @@ public class CommentService {
         return CommentCreateRes.builder().id(comment.getId()).content(comment.getContent()).build();
     }
 
-    public CommentUpdateRes updateComment(Long commentsId, CommentUpdateReq req, Long userId) {
-        Comment comment = getUserComment(commentsId, userId);
+    public CommentUpdateRes updateComment(Long commentId, CommentUpdateReq req, Long userId) {
+        Comment comment = getUserComment(commentId, userId);
         comment.update(req.content());
         return CommentUpdateRes.builder().id(comment.getId()).content(comment.getContent()).build();
+    }
+
+    public CommentDeleteRes deleteComment(Long commentId, Long userId) {
+
+        Comment comment = getUserComment(commentId, userId);
+        commentRepository.delete(comment);
+        return CommentDeleteRes.builder().message("댓글 삭제 성공").build();
     }
 
     private Comment findComment(Long commentId) {

@@ -5,11 +5,13 @@ import static org.springframework.http.HttpStatus.CREATED;
 import com.b3.ddarelro.domain.comment.dto.request.CommentCreateReq;
 import com.b3.ddarelro.domain.comment.dto.request.CommentUpdateReq;
 import com.b3.ddarelro.domain.comment.dto.response.CommentCreateRes;
+import com.b3.ddarelro.domain.comment.dto.response.CommentDeleteRes;
 import com.b3.ddarelro.domain.comment.dto.response.CommentUpdateRes;
 import com.b3.ddarelro.domain.comment.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -32,12 +34,22 @@ public class CommentController {
         return ResponseEntity.status(CREATED).body(res);
     }
 
-    @PutMapping("/{commentsId}")
-    public ResponseEntity<CommentUpdateRes> updateComment(@PathVariable Long commentsId,
+    @PutMapping("/{commentId}")
+    public ResponseEntity<CommentUpdateRes> updateComment(@PathVariable Long commentId,
         CommentUpdateReq req, @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        CommentUpdateRes res = commentService.updateComment(commentsId, req,
+        CommentUpdateRes res = commentService.updateComment(commentId, req,
             userDetails.getUser().getId());
         return ResponseEntity.ok(res);
     }
+
+    @DeleteMapping("/{commentId}")
+    public ResponseEntity<CommentDeleteRes> deleteComment(@PathVariable Long commentId,
+        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        CommentDeleteRes res = commentService.deleteComment(commentId,
+            userDetails.getUser().getId());
+        return ResponseEntity.ok(res);
+    }
+
 }
