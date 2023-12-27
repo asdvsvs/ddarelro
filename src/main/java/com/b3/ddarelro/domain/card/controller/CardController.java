@@ -31,6 +31,11 @@ public class CardController {
     }
 
     //TODO 카드 단일 조회
+    @GetMapping("/{cardId}")
+    public ResponseEntity<CardRes> getCard(@PathVariable Long cardId) {
+        CardRes resDto = cardService.getCard(cardId);
+        return ResponseEntity.ok().body(resDto);
+    }
 
     //TODO 카드 작업자 할당
 
@@ -39,4 +44,5 @@ public class CardController {
     //TODO 카드 삭제
 
     //TODO 카드 콜롬간 이동
+
 }
