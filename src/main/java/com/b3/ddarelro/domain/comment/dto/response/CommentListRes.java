@@ -1,4 +1,4 @@
-package com.b3.ddarelro.domain.comment.dto;
+package com.b3.ddarelro.domain.comment.dto.response;
 
 import lombok.Builder;
 

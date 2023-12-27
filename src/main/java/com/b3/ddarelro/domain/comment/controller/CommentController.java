@@ -2,8 +2,8 @@ package com.b3.ddarelro.domain.comment.controller;
 
 import static org.springframework.http.HttpStatus.CREATED;
 
-import com.b3.ddarelro.domain.comment.dto.CommentListReq;
-import com.b3.ddarelro.domain.comment.dto.CommentListRes;
+import com.b3.ddarelro.domain.comment.dto.request.CommentListReq;
+import com.b3.ddarelro.domain.comment.dto.response.CommentListRes;
 import com.b3.ddarelro.domain.comment.dto.request.CommentCreateReq;
 import com.b3.ddarelro.domain.comment.dto.request.CommentUpdateReq;
 import com.b3.ddarelro.domain.comment.dto.response.CommentCreateRes;
