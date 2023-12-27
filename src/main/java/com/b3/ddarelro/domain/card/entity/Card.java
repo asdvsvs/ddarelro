@@ -1,5 +1,6 @@
 package com.b3.ddarelro.domain.card.entity;
 
+import com.b3.ddarelro.domain.card.dto.request.*;
 import com.b3.ddarelro.domain.comment.entity.*;
 import com.b3.ddarelro.domain.common.*;
 import com.b3.ddarelro.domain.user.entity.*;
@@ -38,5 +39,11 @@ public class Card extends BaseEntity {
         this.color = color;
         this.user = user;
         this.commentList = commentList;
+    }
+
+    public void modifyCard(CardModifyReq reqDto) {
+        this.name = reqDto.getName();
+        this.description = reqDto.getDescription();
+        this.color = reqDto.getColor();
     }
 }

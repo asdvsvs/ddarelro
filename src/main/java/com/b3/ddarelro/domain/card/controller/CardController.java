@@ -40,6 +40,12 @@ public class CardController {
     //TODO 카드 작업자 할당
 
     //TODO 카드 수정
+    @PatchMapping("/{cardId}")
+    public ResponseEntity<CardModifyRes> modifyCard(@PathVariable Long cardId,
+        @RequestBody CardModifyReq reqDto) {
+        CardModifyRes resDto = cardService.modifyCard(cardId, reqDto);
+        return ResponseEntity.ok().body(resDto);
+    }
 
     //TODO 카드 삭제
 
