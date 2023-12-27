@@ -47,8 +47,17 @@ public class CardController {
         return ResponseEntity.ok().body(resDto);
     }
 
-    //TODO 카드 삭제
+    //TODO 마감일 설정
+    
 
+    //TODO 카드 삭제
+    @DeleteMapping("/{cardId}")
+    public ResponseEntity<CardDeleteRes> deleteCard(@PathVariable Long cardId,
+        @RequestBody CardDeleteReq reqDto) {
+        CardDeleteRes resDto = cardService.deleteCard(cardId, reqDto);
+        return ResponseEntity.ok().body(resDto);
+    }
     //TODO 카드 콜롬간 이동
+
 
 }

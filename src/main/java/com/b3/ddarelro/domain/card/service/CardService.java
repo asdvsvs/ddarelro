@@ -5,6 +5,7 @@ import com.b3.ddarelro.domain.card.dto.response.*;
 import com.b3.ddarelro.domain.card.entity.*;
 import com.b3.ddarelro.domain.card.exception.*;
 import com.b3.ddarelro.domain.card.repository.*;
+import com.b3.ddarelro.domain.column.entity.*;
 import com.b3.ddarelro.global.exception.*;
 import java.util.*;
 import java.util.stream.*;
@@ -16,21 +17,24 @@ import org.springframework.stereotype.*;
 public class CardService {
 
     private final CardRepository cardRepository;
+//    private final ColumnService columnService;
 //    private final UserService userService;
 
     public CardCreateRes createCard(CardCreateReq reqDto) {
+        //TODO 컬럼 deleted 확인
 //        columnService.findColumn(reqDto.getColumnId()).orElseThrow(() -> new GlobalException());
         Card newCard = Card.builder()
-            .name(reqDto.getName())
+            .name(reqDto.name())
             //.user(user)
-            .description(reqDto.getDescription())
-            .color(reqDto.getColor())
+            .description(reqDto.description())
+            .color(reqDto.color())
             .build();
         cardRepository.save(newCard);
         return CardCreateRes.formingWith(newCard);
     }
 
     public List<CardListRes> getCardList() {
+        //TODO 컬럼 deleted 확인
 //        Column column = columnService.findColumn(reqDto.getColumnId())
 //            .orElseThrow(() -> new GlobalException());
         List<Card> cardList = cardRepository.findAllByOrderByCreatedAtDesc();
@@ -39,6 +43,7 @@ public class CardService {
     }
 
     public CardRes getCard(Long cardId) {
+        //TODO 컬럼 deleted 확인
 //        Column column = columnService.findColumn(reqDto.getColumnId())
 //            .orElseThrow(() -> new GlobalException());
         Card card = findCard(cardId);
@@ -47,10 +52,31 @@ public class CardService {
     }
 
     public CardModifyRes modifyCard(Long cardId, CardModifyReq reqDto) {
+        //TODO 컬럼 deleted 확인
         Card card = findCard(cardId);
         //findUser(user, card);
         card.modifyCard(reqDto);
         return CardModifyRes.formWith(card);
+    }
+
+    public CardDeleteRes deleteCard(Long cardId, CardDeleteReq req) {
+        //TODO 컬럼 deleted 확인
+        Column column = columnService.findColum(req);
+        if (column.getDeleted()) {
+            throw new GlobalException(ColumnErrorCode.NOT_FOUND);
+        }
+
+        Card card = getUserCard(cardId);
+        card.deleteCard();
+        return CardDeleteRes.builder().msg("카드가 삭제 됬어요!").build();
+    }
+
+    private Card getUserCard(Long cardId) {
+        Card card = findCard(cardId);
+//        if (!card.getUser().getId().equals(userId)) {
+//            throw new GlobalException(CardErrorCode.INVALID_USER);
+//        }
+        return card;
     }
 
     public Card findCard(Long cardId) {

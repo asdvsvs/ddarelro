@@ -1,12 +1,10 @@
 package com.b3.ddarelro.domain.card.dto.request;
 
-import lombok.*;
+public record CardModifyReq(
 
-@Getter
-public class CardModifyReq {
+    Long columnId,
+    String name,
+    String description,
+    String color) {
 
-    private Long columnId;
-    private String name;
-    private String description;
-    private String color;
 }

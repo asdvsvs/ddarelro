@@ -24,6 +24,8 @@ public class Card extends BaseEntity {
     private String description;
     @Column(nullable = false)
     private String color;
+    private String dueDate;
+    private Boolean deleted;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -32,18 +34,23 @@ public class Card extends BaseEntity {
     private List<Comment> commentList;
 
     @Builder
-    public Card(String name, String description, String color, User user,
+    public Card(String name, String description, String color, Boolean deleted, User user,
         List<Comment> commentList) {
         this.name = name;
         this.description = description;
         this.color = color;
+        this.deleted = deleted;
         this.user = user;
         this.commentList = commentList;
     }
 
     public void modifyCard(CardModifyReq reqDto) {
-        this.name = reqDto.getName();
-        this.description = reqDto.getDescription();
-        this.color = reqDto.getColor();
+        this.name = reqDto.name();
+        this.description = reqDto.description();
+        this.color = reqDto.color();
+    }
+
+    public void deleteCard() {
+        this.deleted = !this.deleted;
     }
 }
