@@ -2,11 +2,15 @@ package com.b3.ddarelro.domain.board.controller;
 
 
 import com.b3.ddarelro.domain.board.dto.request.BoardCreateReq;
+import com.b3.ddarelro.domain.board.dto.request.BoardDropReq;
+import com.b3.ddarelro.domain.board.dto.request.BoardInviteReq;
+import com.b3.ddarelro.domain.board.dto.request.BoardLeaveReq;
 import com.b3.ddarelro.domain.board.dto.request.BoardUpdateReq;
 import com.b3.ddarelro.domain.board.dto.response.BoardCreateRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardDeleteRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardDetailRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardInviteRes;
+import com.b3.ddarelro.domain.board.dto.response.BoardLeaveRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardPriviewRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardUpdateRes;
 import com.b3.ddarelro.domain.board.service.BoardService;
@@ -88,32 +92,48 @@ public class BoardController {
 
     }
 
-    @PostMapping("/{boardId}/members/{userId}")
+    @PostMapping("/{boardId}/invitation}")
     public  ResponseEntity<BoardInviteRes> inviteMember(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable Long boardId,
-        @PathVariable Long userId
+        @RequestBody BoardInviteReq req
     ){
 
-        BoardInviteRes resDto = boardService.inviteMember(userDetails.getUser().getId(),boardId,userId);
+        BoardInviteRes resDto = boardService.inviteMember(userDetails.getUser().getId(),boardId,req);
 
         return ResponseEntity.status(HttpStatus.OK)
             .body(resDto);
 
     }
-    @DeleteMapping("/{boardId}/members/{userId}")
+    @DeleteMapping("/{boardId}/drop") //팀장이 멤버 탈퇴시키기
     public  ResponseEntity<BoardInviteRes> dropMember(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable Long boardId,
-        @PathVariable Long userId
+        @RequestBody BoardDropReq req
     ){
 
-        BoardInviteRes resDto = boardService.dropMember(userDetails.getUser().getId(),boardId,userId);
+        BoardInviteRes resDto = boardService.dropMember(userDetails.getUser().getId(),boardId,req);
 
         return ResponseEntity.status(HttpStatus.OK)
             .body(resDto);
 
     }
+
+    @DeleteMapping("/{boardId}/leave") //자기자신이 탈퇴
+    public  ResponseEntity<BoardLeaveRes> leaveBoard(
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
+        @PathVariable Long boardId,
+        @RequestBody BoardLeaveReq req
+    ){
+
+        BoardLeaveRes resDto = boardService.leaveBoard(userDetails.getUser().getId(),boardId,req);
+
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(resDto);
+
+    }
+
+
 
 
 

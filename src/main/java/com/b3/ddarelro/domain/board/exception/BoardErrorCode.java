@@ -13,8 +13,9 @@ public enum BoardErrorCode implements ErrorCode {
     ALREADY_DELETED_BOARD(HttpStatus.BAD_REQUEST, "이미 삭제된 보드입니다."),
     UNAUTHORIZED_ACCESS_BOARD(HttpStatus.FORBIDDEN, "보드 수정 및 삭제 권한이 없습니다"),
     NOT_BOARD_MEMBER(HttpStatus.BAD_REQUEST, "해당유저는 현재 보드에 속한 멤버가 아닙니다."),
-    FORBIDDEN_INVITE_OWN(HttpStatus.FORBIDDEN, "자기 자신을 초대 및 탈퇴시킬 수 없습니다."),
-    ALREADY_BOARD_MEMBER(HttpStatus.BAD_REQUEST, "해당유저는 이미 초대된 멤버입니다.");
+    FORBIDDEN_INVITE_OWN(HttpStatus.FORBIDDEN, "자기 자신을 초대시킬 수 없습니다."),
+    ALREADY_BOARD_MEMBER(HttpStatus.BAD_REQUEST, "해당유저는 이미 초대된 멤버입니다."),
+    REQUIRED_NEW_BOARD_ADMIN(HttpStatus.BAD_REQUEST, "팀장권한을 위임할 사용하자가 필요합니다.");
 
 
 
