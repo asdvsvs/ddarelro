@@ -1,11 +1,12 @@
 package com.b3.ddarelro.domain.card.dto.response;
 
-import com.b3.ddarelro.domain.card.entity.Card;
-import java.time.LocalDateTime;
-import lombok.Builder;
+import com.b3.ddarelro.domain.card.entity.*;
+import java.time.*;
+import lombok.*;
 
 @Builder
 public record CardListRes(
+    Long id,
     String name,
     String description,
     String color,
@@ -15,6 +16,7 @@ public record CardListRes(
 
     public static CardListRes formWith(Card card) {
         return CardListRes.builder()
+            .id(card.getId())
             .name(card.getName())
             //.username(card.getUser().getUsername())
             .description(card.getDescription())
