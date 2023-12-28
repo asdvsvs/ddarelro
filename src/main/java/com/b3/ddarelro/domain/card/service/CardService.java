@@ -1,28 +1,23 @@
 package com.b3.ddarelro.domain.card.service;
 
-import com.b3.ddarelro.domain.card.dto.request.CardCreateReq;
-import com.b3.ddarelro.domain.card.dto.request.CardDeleteReq;
-import com.b3.ddarelro.domain.card.dto.request.CardDueDateReq;
-import com.b3.ddarelro.domain.card.dto.request.CardModifyReq;
-import com.b3.ddarelro.domain.card.dto.response.CardCreateRes;
-import com.b3.ddarelro.domain.card.dto.response.CardDeleteRes;
-import com.b3.ddarelro.domain.card.dto.response.CardDueDateRes;
-import com.b3.ddarelro.domain.card.dto.response.CardListRes;
-import com.b3.ddarelro.domain.card.dto.response.CardModifyRes;
-import com.b3.ddarelro.domain.card.dto.response.CardRes;
-import com.b3.ddarelro.domain.card.entity.Card;
-import com.b3.ddarelro.domain.card.exception.CardErrorCode;
-import com.b3.ddarelro.domain.card.repository.CardRepository;
-import com.b3.ddarelro.domain.column.entity.Column;
-import com.b3.ddarelro.domain.column.exception.ColumnErrorCode;
-import com.b3.ddarelro.domain.column.service.ColumnService;
-import com.b3.ddarelro.global.exception.GlobalException;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import com.b3.ddarelro.domain.card.dto.request.*;
+import com.b3.ddarelro.domain.card.dto.response.*;
+import com.b3.ddarelro.domain.card.entity.*;
+import com.b3.ddarelro.domain.card.exception.*;
+import com.b3.ddarelro.domain.card.repository.*;
+import com.b3.ddarelro.domain.column.entity.*;
+import com.b3.ddarelro.domain.column.exception.*;
+import com.b3.ddarelro.domain.column.service.*;
+import com.b3.ddarelro.domain.comment.service.*;
+import com.b3.ddarelro.domain.user.entity.*;
+import com.b3.ddarelro.domain.user.service.*;
+import com.b3.ddarelro.global.exception.*;
+import java.time.*;
+import java.util.*;
+import java.util.stream.*;
+import lombok.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
 
 @Service
 @RequiredArgsConstructor
@@ -30,54 +25,66 @@ public class CardService {
 
     private final CardRepository cardRepository;
     private final ColumnService columnService;
-//    private final UserService userService;
+    private final UserService userService;
+    private final CommentDeleteRestoreService commentDeleteRestoreService;
 
-    public CardCreateRes createCard(CardCreateReq req) {
-        //TODO 컬럼 deleted 확인
-//        columnService.findColumn(reqDto.getColumnId()).orElseThrow(() -> new GlobalException());
+    @Transactional
+    public CardCreateRes createCard(CardCreateReq req, User user) {
+        userService.findUser(user.getId());
+        Long columnId = req.columnId();
+        checkColumnDeleted(columnId);
+
+        Long priority = cardRepository.countByColumnId(req.columnId()) + 1;
+
         Card newCard = Card.builder()
             .name(req.name())
-            //.user(user)
+            .user(user)
             .description(req.description())
             .color(req.color())
+            .priority(priority)
             .build();
         cardRepository.save(newCard);
-        return CardCreateRes.formingWith(newCard);
+        return CardCreateRes.formingWith(newCard, priority);
     }
 
-    public List<CardListRes> getCardList() {
-        //TODO 컬럼 deleted 확인
-//        Column column = columnService.findColumn(reqDto.getColumnId())
-//            .orElseThrow(() -> new GlobalException());
+    public List<CardListRes> getCardList(CardListReq req, User user) {
+        userService.findUser(user.getId());
+        Long columnId = req.columnId();
+        checkColumnDeleted(columnId);
+
         List<Card> cardList = cardRepository.findAllByOrderByCreatedAtDesc();
+
         return cardList.stream().map(card -> CardListRes.formWith(card))
             .collect(Collectors.toList());
     }
 
-    public CardRes getCard(Long cardId) {
-        //TODO 컬럼 deleted 확인
-//        Column column = columnService.findColumn(reqDto.getColumnId())
-//            .orElseThrow(() -> new GlobalException());
+    public CardRes getCard(Long cardId, CardReq req, User user) {
+        userService.findUser(user.getId());
+        Long columnId = req.columnId();
+        checkColumnDeleted(columnId);
+
         Card card = findCard(cardId);
 
         return CardRes.formWith(card);
     }
 
     @Transactional
-    public CardModifyRes modifyCard(Long cardId, CardModifyReq req) {
+    public CardModifyRes modifyCard(Long cardId, CardModifyReq req, User user) {
+        userService.findUser(user.getId());
         Long columnId = req.columnId();
-        checkColumn(columnId);
+        checkColumnDeleted(columnId);
 
         Card card = findCard(cardId);
-        //findUser(user, card);
+
         card.modifyCard(req);
         return CardModifyRes.formWith(card);
     }
 
     @Transactional
-    public CardDueDateRes setDueDateCard(Long cardId, CardDueDateReq req) {
+    public CardDueDateRes setDueDateCard(Long cardId, CardDueDateReq req, User user) {
+        userService.findUser(user.getId());
         Long columnId = req.columnId();
-        checkColumn(columnId);
+        checkColumnDeleted(columnId);
 
         Card card = findCard(cardId);
 
@@ -87,14 +94,27 @@ public class CardService {
 
     }
 
-    public CardDeleteRes deleteCard(Long cardId, CardDeleteReq req) {
+    @Transactional
+    public CardDeleteRes deleteCard(Long cardId, CardDeleteReq req, User user) {
+        userService.findUser(user.getId());
         Long columnId = req.columnId();
-        checkColumn(columnId);
+        checkColumnDeleted(columnId);
 
-        Card card = getUserCard(cardId);
+        Card card = getUserCard(cardId, user);
         card.deleteCard();
+        List<Card> cardList = cardRepository.findAllByOrderByCreatedAtDesc();
+        List<Long> cardIdList = cardList.stream().map(Card::getId).toList();
+        commentDeleteRestoreService.deleteAllComment(cardIdList);
         return CardDeleteRes.builder().msg("카드가 삭제 됬어요!").build();
     }
+
+    private void checkColumnDeleted(Long columnId) {
+        Column column = columnService.findColumn(columnId);
+        if (column.getDeleted()) {
+            throw new GlobalException(ColumnErrorCode.IS_DELETED);
+        }
+    }
+
 
     private static LocalDate getDueDate(CardDueDateReq req) {
         int year = req.dueDateY();
@@ -105,19 +125,11 @@ public class CardService {
         return dueDate;
     }
 
-    private void checkColumn(Long columnId) {
-        Column column = columnService.findColumn(columnId);
-        if (column.getDeleted()) {
-            throw new GlobalException(ColumnErrorCode.IS_DELETED);
-        }
-    }
-
-    private Card getUserCard(Long cardId) {
+    private Card getUserCard(Long cardId, User user) {
         Card card = findCard(cardId);
-        //TODO 사용자 확인
-//        if (!card.getUser().getId().equals(userId)) {
-//            throw new GlobalException(CardErrorCode.INVALID_USER);
-//        }
+        if (!card.getUser().getId().equals(user.getId())) {
+            throw new GlobalException(CardErrorCode.INVALID_USER);
+        }
         return card;
     }
 
