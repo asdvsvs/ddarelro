@@ -29,10 +29,6 @@ public class UserService {
             throw new GlobalException(UserErrorCode.EXISTS_EMAIL);
         }
 
-        if (userRepository.existsByUsername(reqDto.username())) {
-            throw new GlobalException(UserErrorCode.EXISTS_NICKNAME);
-        }
-
         if (!reqDto.password().equals(reqDto.passwordCheck())) {
             throw new GlobalException(UserErrorCode.MISMATCH_PASSWORD);
         }
@@ -69,12 +65,6 @@ public class UserService {
             .build();
     }
 
-    public User findUser(final Long id) {
-        User user = userRepository.findById(id)
-            .orElseThrow(() -> new GlobalException(UserErrorCode.NOT_FOUND_USER));
-        return user;
-    }
-
     @Transactional
     public UserPasswordUpdateRes updatePassword(final Long userId,
         final UserPasswordUpdateReq reqDto) {
@@ -87,5 +77,10 @@ public class UserService {
         return UserPasswordUpdateRes.builder()
             .message("비밀 번호 변경에 성공했습니다.")
             .build();
+    }
+
+    public User findUser(final Long id) {
+        return userRepository.findById(id)
+            .orElseThrow(() -> new GlobalException(UserErrorCode.NOT_FOUND_USER));
     }
 }
