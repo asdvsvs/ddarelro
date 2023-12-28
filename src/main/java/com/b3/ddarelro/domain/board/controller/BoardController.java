@@ -36,7 +36,7 @@ public class BoardController {
         @RequestBody BoardCreateReq reqDto
         ){
 
-        BoardCreateRes resDto = boardService.createBoard(userDetails.getUser(),reqDto);
+        BoardCreateRes resDto = boardService.createBoard(userDetails.getUser().getId(),reqDto);
 
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(resDto);
@@ -49,7 +49,7 @@ public class BoardController {
         @RequestBody BoardCreateReq reqDto
     ){
 
-        BoardUpdateRes resDto = boardService.updateBoard(boardId,userDetails.getUser(),reqDto);
+        BoardUpdateRes resDto = boardService.updateBoard(boardId,userDetails.getUser().getId(),reqDto);
 
         return ResponseEntity.status(HttpStatus.OK)
             .body(resDto);
@@ -61,7 +61,7 @@ public class BoardController {
         @PathVariable Long boardId
     ){
 
-        BoardDeleteRes resDto = boardService.deleteBoard(boardId,userDetails.getUser());
+        BoardDeleteRes resDto = boardService.deleteBoard(boardId,userDetails.getUser().getId());
 
         return ResponseEntity.status(HttpStatus.OK)
             .body(resDto);
@@ -80,7 +80,7 @@ public class BoardController {
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable Long boardId
     ){ //보드 단건 조회
-        BoardDetailRes resDto = boardService.getBoardOne(userDetails.getUser(), boardId);
+        BoardDetailRes resDto = boardService.getBoardOne(userDetails.getUser().getId(), boardId);
 
         return ResponseEntity.status(HttpStatus.OK)
             .body(resDto);
@@ -94,7 +94,7 @@ public class BoardController {
         @PathVariable Long userId
     ){
 
-        BoardInviteRes resDto = boardService.inviteMember(userDetails.getUser(),boardId,userId);
+        BoardInviteRes resDto = boardService.inviteMember(userDetails.getUser().getId(),boardId,userId);
 
         return ResponseEntity.status(HttpStatus.OK)
             .body(resDto);
@@ -107,7 +107,7 @@ public class BoardController {
         @PathVariable Long userId
     ){
 
-        BoardInviteRes resDto = boardService.dropMember(userDetails.getUser(),boardId,userId);
+        BoardInviteRes resDto = boardService.dropMember(userDetails.getUser().getId(),boardId,userId);
 
         return ResponseEntity.status(HttpStatus.OK)
             .body(resDto);

@@ -34,9 +34,9 @@ public class BoardService {
     private final UserService userService;
     private final ColumnService columnService;
 
-    public BoardCreateRes createBoard(User user, BoardCreateReq reqDto){
+    public BoardCreateRes createBoard(Long userId, BoardCreateReq reqDto){
 
-        User findUser = userService.findUser(user.getId());
+        User findUser = userService.findUser(userId);
 
 
         Board board = Board.builder()
@@ -60,9 +60,9 @@ public class BoardService {
         return new BoardCreateRes(board);
     }
 
-    public BoardUpdateRes updateBoard(Long boardId, User user, BoardUpdateReq reqDto){
+    public BoardUpdateRes updateBoard(Long boardId, Long userId, BoardUpdateReq reqDto){
 
-        User founddUser = userService.findUser(user.getId());
+        User founddUser = userService.findUser(userId);
         Board foundBoard = findBoard(boardId);
 
         //board 작성자가 맞는지확인
@@ -78,8 +78,8 @@ public class BoardService {
         return new BoardUpdateRes(board);
     }
 
-    public BoardDeleteRes deleteBoard(Long boardId,User user){
-        User founddUser = userService.findUser(user.getId());
+    public BoardDeleteRes deleteBoard(Long boardId,Long userId){
+        User founddUser = userService.findUser(userId);
         Board foundBoard = findBoard(boardId);
 
         //board 작성자가 맞는지확인
@@ -102,9 +102,9 @@ public class BoardService {
 
     }
     @Transactional(readOnly = true)
-    public BoardDetailRes getBoardOne(User user, Long boardId) {
+    public BoardDetailRes getBoardOne(Long userId, Long boardId) {
 
-        User founddUser = userService.findUser(user.getId());
+        User founddUser = userService.findUser(userId);
 
         Board foundBoard = findBoard(boardId);
 
@@ -115,11 +115,11 @@ public class BoardService {
         return new BoardDetailRes(foundBoard);
     }
 
-    public BoardInviteRes inviteMember(User user, Long boardId, Long invitedUserId){
+    public BoardInviteRes inviteMember(Long userId, Long boardId, Long invitedUserId){
 
-        validateInviteOwn(user,invitedUserId); // 자기자신을 초대하는지 체크
+        validateInviteOwn(userId,invitedUserId); // 자기자신을 초대하는지 체크
 
-        User founddUser = userService.findUser(user.getId());
+        User founddUser = userService.findUser(userId);
 
         User invitedUser = userService.findUser(invitedUserId);
 
@@ -146,10 +146,10 @@ public class BoardService {
         return new BoardInviteRes("초대가 완료되었습니다.");
     }
 
-    public BoardDropRes dropMember(User user, Long boardId, Long dropUserId){
+    public BoardDropRes dropMember(Long userId, Long boardId, Long dropUserId){
 
-        validateInviteOwn(user,dropUserId); // 자기자신을 초대하는지 체크
-        User founddUser = userService.findUser(user.getId());
+        validateInviteOwn(userId,dropUserId); // 자기자신을 초대하는지 체크
+        User founddUser = userService.findUser(userId);
         User dropUser = userService.findUser(dropUserId);
         Board foundBoard = findBoard(boardId);
         validteUserAuthority(founddUser,foundBoard);
@@ -169,13 +169,10 @@ public class BoardService {
         Board board = boardRepository.findById(id)
             .orElseThrow(()->new GlobalException(BoardErrorCode.NOT_FOUND_BOARD));
 
-        if(board.getDeleted().equals(false)){
-            return board;
-        }
-        else{
+        if(board.getDeleted()){
             throw new GlobalException(BoardErrorCode.NOT_FOUND_BOARD);
         }
-
+        return board;
     }
 
     private void validteUserAuthority(User foundUser,Board foundBoard) {
@@ -201,8 +198,8 @@ public class BoardService {
     }
 
 
-    private void validateInviteOwn(User user, Long userId){ //자기 자신을 초대 및 탈퇴 시키는지 확인
-        if(user.getId().equals(userId)){
+    private void validateInviteOwn(Long userId, Long otherUserId){ //자기 자신을 초대 및 탈퇴 시키는지 확인
+        if(userId.equals(otherUserId)){
             throw new GlobalException(BoardErrorCode.FORBIDDEN_INVITE_OWN);
         }
     }
