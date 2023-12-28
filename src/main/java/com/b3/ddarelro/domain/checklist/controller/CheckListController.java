@@ -5,11 +5,13 @@ import static org.springframework.http.HttpStatus.CREATED;
 import com.b3.ddarelro.domain.checklist.dto.request.CheckListCreateReq;
 import com.b3.ddarelro.domain.checklist.dto.response.CheckListCompletedRes;
 import com.b3.ddarelro.domain.checklist.dto.response.CheckListCreateRes;
+import com.b3.ddarelro.domain.checklist.dto.response.CheckListDeleteRes;
 import com.b3.ddarelro.domain.checklist.dto.response.CheckListGetListRes;
 import com.b3.ddarelro.domain.checklist.service.CheckListService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,6 +46,12 @@ public class CheckListController {
         @PathVariable Long checkListId) {
 
         CheckListCompletedRes res = checkListService.completedCheckList(checkListId);
+        return ResponseEntity.ok(res);
+    }
+
+    @DeleteMapping("/checkList/{checkListId}")
+    public ResponseEntity<CheckListDeleteRes> deleteCheckList(@PathVariable Long checkListId) {
+        CheckListDeleteRes res = checkListService.deleteCheckList(checkListId);
         return ResponseEntity.ok(res);
     }
 }

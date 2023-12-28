@@ -5,6 +5,7 @@ import com.b3.ddarelro.domain.card.service.CardService;
 import com.b3.ddarelro.domain.checklist.dto.request.CheckListCreateReq;
 import com.b3.ddarelro.domain.checklist.dto.response.CheckListCompletedRes;
 import com.b3.ddarelro.domain.checklist.dto.response.CheckListCreateRes;
+import com.b3.ddarelro.domain.checklist.dto.response.CheckListDeleteRes;
 import com.b3.ddarelro.domain.checklist.dto.response.CheckListGetDetailRes;
 import com.b3.ddarelro.domain.checklist.dto.response.CheckListGetListRes;
 import com.b3.ddarelro.domain.checklist.entity.CheckList;
@@ -46,6 +47,12 @@ public class CheckListService {
         checkList.completeToggle();
         return CheckListCompletedRes.builder().id(checkList.getId()).content(checkList.getContent())
             .completed(checkList.getCompleted()).build();
+    }
+
+    public CheckListDeleteRes deleteCheckList(Long checkListId) {
+        CheckList checkList = findCheckList(checkListId);
+        checkListRepository.delete(checkList);
+        return CheckListDeleteRes.builder().message("체크리스트 삭제 성공").build();
     }
 
     private CheckList findCheckList(Long checkListId) {
