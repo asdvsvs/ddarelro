@@ -1,18 +1,22 @@
 package com.b3.ddarelro.domain.board.dto.request;
 
 import com.b3.ddarelro.domain.board.entity.Color;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-public class BoardUpdateReqDto {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class BoardCreateReq {
+
     private Color color;
     private String name;
     private String description;
     private Boolean deleted;
 
     @Builder
-    private BoardUpdateReqDto(Color color, String name, String description){
+    private BoardCreateReq(Color color, String name, String description){
         this.color = color;
         this.deleted = false;
         this.name = name;
