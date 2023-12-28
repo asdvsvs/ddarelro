@@ -58,7 +58,8 @@ public class ColumnService {
         List<Column> columns = columnRepository.findAllByBoardIdAndNotDeleted(board.getId());
 
         return columns.stream().map(column -> ColumnsGetRes.builder()
-            .columnId(column.getId()).title(column.getTitle()).build()).toList();
+            .columnId(column.getId()).priority(column.getPriority()).title(column.getTitle())
+            .build()).toList();
     }
 
     @Transactional
