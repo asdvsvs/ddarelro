@@ -18,8 +18,7 @@ public interface ColumnRepository extends JpaRepository<Column, Long> {
     List<Long> findAllByBoardIdAndDeleted(Long boardId);
 
     @Query("select count(*) from Column c "
-        + "join c.board b "
-        + "where b.id = :boardId")
+        + "where c.board.id = :boardId")
     Long countByBoardId(Long boardId);
 
     @Modifying
