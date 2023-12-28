@@ -15,4 +15,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Modifying
     @Query(value = "update Comment c set c.deleted = true where c.card.id in (:cardIds)")
     void SoftDelete(List<Long> cardIds);
+
+    @Modifying
+    @Query(value = "update Comment c set c.deleted = false where c.card.id in (:cardIds)")
+    void restoreAll(List<Long> cardIds);
 }

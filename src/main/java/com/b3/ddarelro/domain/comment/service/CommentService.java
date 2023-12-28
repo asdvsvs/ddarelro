@@ -56,6 +56,10 @@ public class CommentService {
         return CommentDeleteRes.builder().message("댓글 삭제 성공").build();
     }
 
+    /**
+     * 카드는 soft delete 되는 경우가 card가 soft delete된 경우 밖에 없어서 card만 soft delete 체크하면 되면 된다 findCard를 통해
+     * card가 soft delete 됐는지 여부가 체크가 된다.
+     */
     public List<CommentListRes> getComments(CommentListReq req) {
         Card card = cardService.findCard(req.cardId());
         List<Comment> comments = commentRepository.findAllByFetchJoinUser(card);
@@ -73,6 +77,13 @@ public class CommentService {
      */
     public void deleteAllComment(List<Long> cardIds) {
         commentRepository.SoftDelete(cardIds);
+    }
+
+    /**
+     * Card가 restore할 때 comment도 restore 한다.
+     */
+    public void restoreAllComment(List<Long> cardIds) {
+        commentRepository.restoreAll(cardIds);
     }
 
     private Comment findComment(Long commentId) {
