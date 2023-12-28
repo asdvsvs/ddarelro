@@ -23,7 +23,7 @@ public class UserService {
             throw new GlobalException(UserErrorCode.EXISTS_EMAIL);
         }
 
-        if (userRepository.existsByNickname(req.username())) {
+        if (userRepository.existsByUsername(req.username())) {
             throw new GlobalException(UserErrorCode.EXISTS_NICKNAME);
         }
 
@@ -36,7 +36,7 @@ public class UserService {
         User user = User.builder()
             .email(req.email())
             .username(req.username())
-            .password(req.password())
+            .password(encryptionPassword)
             .build();
 
         userRepository.save(user);
