@@ -30,23 +30,25 @@ public class Card extends BaseEntity {
     private Long priority;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "column_id")
     private com.b3.ddarelro.domain.column.entity.Column column;
     @OneToMany(mappedBy = "card")
     private List<Comment> commentList;
 
     @Builder
     public Card(String name, String description, String color, Boolean deleted, Long priority,
-        User user,
+        User user, com.b3.ddarelro.domain.column.entity.Column column,
         List<Comment> commentList) {
         this.name = name;
         this.description = description;
         this.color = color;
-        this.deleted = deleted;
+        this.deleted = deleted != null ? deleted : false;
         this.priority = priority;
         this.user = user;
+        this.column = column;
         this.commentList = commentList;
     }
 

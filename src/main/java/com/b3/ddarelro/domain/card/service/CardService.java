@@ -5,6 +5,7 @@ import com.b3.ddarelro.domain.card.dto.response.*;
 import com.b3.ddarelro.domain.card.entity.*;
 import com.b3.ddarelro.domain.card.exception.*;
 import com.b3.ddarelro.domain.card.repository.*;
+import com.b3.ddarelro.domain.column.entity.*;
 import com.b3.ddarelro.domain.column.service.*;
 import com.b3.ddarelro.domain.comment.service.*;
 import com.b3.ddarelro.domain.user.entity.*;
@@ -30,13 +31,14 @@ public class CardService {
     public CardCreateRes createCard(CardCreateReq req, User user) {
         userService.findUser(user.getId());
         Long columnId = req.columnId();
-        columnService.findColumn(columnId);
+        Column column = columnService.findColumn(columnId);
 
         Long priority = cardRepository.countByColumnId(req.columnId()) + 1;
 
         Card newCard = Card.builder()
             .name(req.name())
             .user(user)
+            .column(column)
             .description(req.description())
             .color(req.color())
             .priority(priority)
@@ -47,10 +49,9 @@ public class CardService {
 
     public List<CardListRes> getCardList(CardListReq req, User user) {
         userService.findUser(user.getId());
-        Long columnId = req.columnId();
-        columnService.findColumn(columnId);
+        Column column = columnService.findColumn(req.columnId());
 
-        List<Card> cardList = cardRepository.findAllByOrderByCreatedAtDesc();
+        List<Card> cardList = cardRepository.findAllByColumnIdAndNotDeleted(column.getId());
 
         return cardList.stream().map(card -> CardListRes.formWith(card))
             .collect(Collectors.toList());
@@ -96,12 +97,11 @@ public class CardService {
     @Transactional
     public CardDeleteRes deleteCard(Long cardId, CardDeleteReq req, User user) {
         userService.findUser(user.getId());
-        Long columnId = req.columnId();
-        columnService.findColumn(columnId);
+        Column column = columnService.findColumn(req.columnId());
 
         Card card = getUserCard(cardId, user);
         card.deleteCard();
-        List<Card> cardList = cardRepository.findAllByOrderByCreatedAtDesc();
+        List<Card> cardList = cardRepository.findAllByColumnIdAndNotDeleted(column.getId());
         List<Long> cardIdList = cardList.stream().map(Card::getId).toList();
         commentDeleteRestoreService.deleteAllComment(cardIdList);
         return CardDeleteRes.builder().msg("카드가 삭제 됬어요!").build();
