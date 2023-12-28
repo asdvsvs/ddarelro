@@ -5,6 +5,7 @@ import com.b3.ddarelro.domain.comment.entity.*;
 import com.b3.ddarelro.domain.common.*;
 import com.b3.ddarelro.domain.user.entity.*;
 import jakarta.persistence.*;
+import java.time.*;
 import java.util.*;
 import lombok.*;
 
@@ -24,7 +25,7 @@ public class Card extends BaseEntity {
     private String description;
     @Column(nullable = false)
     private String color;
-    private Date dueDate;
+    private LocalDate dueDate;
     private Boolean deleted;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -54,6 +55,7 @@ public class Card extends BaseEntity {
         this.deleted = !this.deleted;
     }
 
-    public Date setDueDate() {
+    public void setDueDate(LocalDate dueDate) {
+        this.dueDate = dueDate;
     }
 }
