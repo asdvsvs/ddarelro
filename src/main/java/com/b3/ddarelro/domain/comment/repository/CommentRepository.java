@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
-    @Query("select c from Comment c join fetch c.user order by c.createdAt desc")
+    @Query("select c from Comment c join fetch c.user where c.card = :card order by c.createdAt desc")
     List<Comment> findAllByFetchJoinUser(Card card);
 
     @Modifying
