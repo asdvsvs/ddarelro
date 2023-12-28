@@ -58,7 +58,7 @@ public class ColumnService {
         List<Column> columns = columnRepository.findAllByBoardIdAndNotDeleted(board.getId());
 
         return columns.stream().map(column -> ColumnsGetRes.builder()
-            .title(column.getTitle()).build()).toList();
+            .columnId(column.getId()).title(column.getTitle()).build()).toList();
     }
 
     @Transactional
@@ -91,7 +91,8 @@ public class ColumnService {
     public ColumnRestoreRes restoreColumn(Long columnId, ColumnRestoreReq req, Long userId) {
         getBoardAndLeaderCheck(req.boardId(), userId);
 
-        Column column = findColumn(columnId);
+        Column column = columnRepository.findById(columnId)
+            .orElseThrow(() -> new GlobalException(ColumnErrorCode.NOT_FOUND));
         column.restore();
 //        cardDeleteRestoreService.restoreAllCard(List.of(columnId));
 
