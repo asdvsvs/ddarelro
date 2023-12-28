@@ -2,6 +2,7 @@ package com.b3.ddarelro.domain.column.service;
 
 import com.b3.ddarelro.domain.board.entity.Board;
 import com.b3.ddarelro.domain.board.service.BoardService;
+import com.b3.ddarelro.domain.card.service.CardService;
 import com.b3.ddarelro.domain.column.dto.request.ColumnCreateReq;
 import com.b3.ddarelro.domain.column.dto.request.ColumnDeleteReq;
 import com.b3.ddarelro.domain.column.dto.request.ColumnGetReq;
@@ -27,6 +28,7 @@ public class ColumnService {
     private final ColumnRepository columnRepository;
     private final BoardService boardService;
     private final UserService userService;
+    private final CardService cardService;
 
     public ColumnCreateRes createColumn(ColumnCreateReq req, Long userId) {
         Board board = getBoardAndLeaderCheck(req.boardId(), userId);
@@ -48,10 +50,8 @@ public class ColumnService {
     public List<ColumnsGetRes> getColumns(ColumnGetReq req, Long userId) {
         Board board = boardService.findBoard(req.boardId());
         User user = userService.findUser(userId);
-        List<User> boardUsers = board.getUsers();
-        if (!boardUsers.contains(user)) {
-            throw new GlobalException(ColumnErrorCode.INVALID_USER);
-        }
+
+        boardService.validateMember(user, board);
 
         List<Column> columns = columnRepository.findAllByBoardId(board.getId());
 
@@ -61,7 +61,7 @@ public class ColumnService {
 
     @Transactional
     public ColumnUpdateRes updateColumn(Long columnId, ColumnUpdateReq req, Long userId) {
-        Board board = getBoardAndLeaderCheck(req.boardId(), userId);
+        getBoardAndLeaderCheck(req.boardId(), userId);
 
         Column column = findColumn(columnId);
         column.update(req.title());
@@ -73,15 +73,23 @@ public class ColumnService {
 
     @Transactional
     public ColumnDeleteRes deleteColumn(Long columnId, ColumnDeleteReq req, Long userId) {
-        Board board = getBoardAndLeaderCheck(req.boardId(), userId);
+        getBoardAndLeaderCheck(req.boardId(), userId);
 
         Column column = findColumn(columnId);
         column.delete();
+        cardService.deleteAllCard(List.of(columnId));
 
         return ColumnDeleteRes.builder()
             .title(column.getTitle())
             .deleted(column.getDeleted())
             .build();
+    }
+
+    public void deleteAllColumn(Long boardId) {
+        List<Column> columns = columnRepository.findAllByBoardId(boardId);
+        List<Long> columnIdList = columns.stream().map(Column::getId).toList();
+        columns.forEach(Column::delete);
+        cardService.deleteAllCard(columnIdList);
     }
 
     public Column findColumn(Long columnId) {
@@ -96,16 +104,7 @@ public class ColumnService {
     private Board getBoardAndLeaderCheck(Long boardId, Long userId) {
         Board board = boardService.findBoard(boardId);
         User user = userService.findUser(userId);
-        validateLeader(board, user);
+        boardService.validteUserAuthority(user, board);
         return board;
-    }
-
-    private void validateLeader(Board board, User user) {
-        List<User> boardUsers = board.getUsers();
-        User boardLeader = boardUsers.stream().filter(u -> u.getAuthority().equals(LEADER))
-            .findFirst();
-        if (boardLeader != user) {
-            throw new GlobalException(ColumnErrorCode.NOT_LEADER);
-        }
     }
 }
