@@ -5,6 +5,8 @@ public record CardModifyReq(
     Long columnId,
     String name,
     String description,
-    String color) {
+    String color
+
+) {
 
 }

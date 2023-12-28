@@ -4,26 +4,16 @@ import com.b3.ddarelro.domain.card.entity.*;
 import java.time.*;
 import lombok.*;
 
-@Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CardModifyRes {
+@Builder
+public record CardModifyRes(
+    String name,
+    String description,
+    String color,
+    LocalDate dueDate,
+    LocalDateTime createdAt,
+    LocalDateTime modifiedAt
 
-    private String name;
-    //private String username;
-    private String description;
-    private String color;
-    private LocalDateTime createdAt;
-    private LocalDateTime modifiedAt;
-
-    @Builder
-    public CardModifyRes(String name, String description, String color, LocalDateTime createdAt,
-        LocalDateTime modifiedAt) {
-        this.name = name;
-        this.description = description;
-        this.color = color;
-        this.createdAt = createdAt;
-        this.modifiedAt = modifiedAt;
-    }
+) {
 
     public static CardModifyRes formWith(Card card) {
         return CardModifyRes.builder()
@@ -31,6 +21,7 @@ public class CardModifyRes {
             //.username
             .description(card.getDescription())
             .color(card.getColor())
+            .dueDate(card.getDueDate())
             .createdAt(card.getCreatedAt())
             .modifiedAt(card.getModifiedAt())
             .build();
