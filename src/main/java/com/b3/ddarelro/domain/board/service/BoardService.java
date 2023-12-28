@@ -150,7 +150,7 @@ public class BoardService {
         validateExistedMember(invitedUser, foundBoard);  //초대할 사용자가 이미 초대된 멤버인지 확인
 
         UserBoard userBoard = UserBoard.builder()
-            .user(founddUser)
+            .user(invitedUser)
             .board(foundBoard)
             .authority(BoardAuthority.MEMBER)
             .build();
