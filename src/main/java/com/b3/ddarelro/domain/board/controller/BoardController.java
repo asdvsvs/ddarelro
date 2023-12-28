@@ -12,6 +12,7 @@ import com.b3.ddarelro.domain.board.dto.response.BoardDetailRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardInviteRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardLeaveRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardPriviewRes;
+import com.b3.ddarelro.domain.board.dto.response.BoardRestoreRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardUpdateRes;
 import com.b3.ddarelro.domain.board.service.BoardService;
 import java.util.List;
@@ -67,6 +68,18 @@ public class BoardController {
     ){
 
         BoardDeleteRes resDto = boardService.deleteBoard(boardId,userDetails.getUser().getId());
+
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(resDto);
+    }
+
+    @PatchMapping("/{boardId}/restore")
+    public ResponseEntity<BoardRestoreRes> restoreBoard(
+        //@AuthenticationPrincipal UserDetailsImpl userDetails,
+        @PathVariable Long boardId
+    ){
+
+        BoardRestoreRes resDto = boardService.restoreBoard(userDetails.getUser().getId(),boardId);
 
         return ResponseEntity.status(HttpStatus.OK)
             .body(resDto);

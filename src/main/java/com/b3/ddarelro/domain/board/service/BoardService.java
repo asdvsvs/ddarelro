@@ -12,6 +12,7 @@ import com.b3.ddarelro.domain.board.dto.response.BoardDropRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardInviteRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardLeaveRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardPriviewRes;
+import com.b3.ddarelro.domain.board.dto.response.BoardRestoreRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardUpdateRes;
 
 import com.b3.ddarelro.domain.board.entity.Board;
@@ -89,9 +90,21 @@ public class BoardService {
         //board 작성자가 맞는지확인
         validteUserAuthority(founddUser,foundBoard);
 
-        foundBoard.deleteBoardState(true);
+        foundBoard.updateBoardState(true);
         //columnService.deleteAllColumn(boardId);
         return new BoardDeleteRes("삭제가 완료되었습니다.");
+    }
+
+    public BoardRestoreRes restoreBoard(Long userId, Long boardId){
+
+        User founddUser = userService.findUser(userId);
+        Board foundBoard = findBoard(boardId);
+
+        foundBoard.updateBoardState(false);
+
+        return new BoardRestoreRes(foundBoard);
+
+
     }
 
     @Transactional(readOnly = true)
@@ -123,7 +136,9 @@ public class BoardService {
 
         Long invitedUserId = req.getUserId();
 
-        validateInviteOwn(userId,invitedUserId); // 자기자신을 초대하는지 체크
+        if(invitedUserId.equals(userId)){
+            throw new GlobalException(BoardErrorCode.FORBIDDEN_INVITE_OWN);
+        }
 
         User founddUser = userService.findUser(userId);
 
@@ -155,15 +170,18 @@ public class BoardService {
     public BoardDropRes dropMember(Long userId, Long boardId, BoardDropReq req){
 
         Long dropUserId = req.getUserId();
-        validateInviteOwn(userId,dropUserId); // 자기자신을 초대하는지 체크
+
+        if(dropUserId.equals(userId)){
+            throw new GlobalException(BoardErrorCode.FORBIDDEN_DROP_OWN);
+        }
+
+
         User founddUser = userService.findUser(userId);
         User dropUser = userService.findUser(dropUserId);
         Board foundBoard = findBoard(boardId);
         validteUserAuthority(founddUser,foundBoard);
 
-        validateMember(dropUser,foundBoard); //탈퇴할 사용자가 멤버에 있는지 확인
-
-        UserBoard userBoard = userBoardRepository.findByUserAndBoard(dropUser,foundBoard).get();
+        UserBoard userBoard = validateMember(dropUser,foundBoard); //탈퇴할 사용자가 멤버에 있는지 확인
 
         userBoardRepository.delete(userBoard);
 
@@ -175,23 +193,9 @@ public class BoardService {
         User founddUser = userService.findUser(userId);
         Board foundBoard = findBoard(boardId);
 
-        validateMember(founddUser,foundBoard);
+        UserBoard userBoard = validateMember(founddUser,foundBoard);
 
-        UserBoard userBoard = userBoardRepository.findByUserAndBoard(founddUser,foundBoard).get();
-
-        if(userBoard.getBoardAuthority().equals(BoardAuthority.ADMIN)){
-            //팀장이면 권한을 다른사람한테 넘겨줘야함
-            if(req.getUserId().equals(null)){
-                throw new GlobalException(BoardErrorCode.REQUIRED_NEW_BOARD_ADMIN); //팀장일경우 권한을 넘겨줘야합니다.
-            }
-
-            User DelegateeUser = userService.findUser(req.getUserId());
-            validateMember(DelegateeUser,foundBoard);
-
-            UserBoard updateUserBoard = userBoardRepository.findByUserAndBoard(DelegateeUser,foundBoard).get();
-            updateUserBoard.UpdateAuthority(BoardAuthority.ADMIN);
-
-        }
+        validedateLeaveMember(userBoard,req.getUserId());
 
         userBoardRepository.delete(userBoard);
 
@@ -210,10 +214,9 @@ public class BoardService {
         return board;
     }
 
-    private void validteUserAuthority(User foundUser,Board foundBoard) {
+    public void validteUserAuthority(User foundUser,Board foundBoard) {
         // 해당 보드,유저를 가지고있는 userBoard확인 후 권한을 가지고있는 유저인지 체크
-        validateMember(foundUser,foundBoard);
-        UserBoard foundUserBoard = userBoardRepository.findByUserAndBoard(foundUser,foundBoard).get();
+        UserBoard foundUserBoard = validateMember(foundUser,foundBoard);
         if(foundUserBoard.getBoardAuthority() != BoardAuthority.ADMIN){
             throw new GlobalException(BoardErrorCode.UNAUTHORIZED_ACCESS_BOARD);
         }
@@ -225,10 +228,10 @@ public class BoardService {
         }
     }
 
-    private void validateMember(User user, Board board){ // 같은 user,board를 가지고있는 userboard가 있는지 확인
-        if(!userBoardRepository.existsByUserAndBoard(user,board)){
-            throw new GlobalException(BoardErrorCode.NOT_BOARD_MEMBER);
-        }
+    public UserBoard validateMember(User user, Board board){ // 같은 user,board를 가지고있는 userboard가 있는지 확인
+
+        return userBoardRepository.findByUserAndBoard(user,board)
+            .orElseThrow(()->new GlobalException(BoardErrorCode.NOT_BOARD_MEMBER));
     }
 
     private void validateInviteOwn(Long userId, Long otherUserId){ //자기 자신을 초대하는지확인
@@ -240,6 +243,19 @@ public class BoardService {
     private void validateExistedMember(User user, Board board){ // 이미 가입되어있느 멤버인지 확인
         if(userBoardRepository.existsByUserAndBoard(user,board)){
             throw new GlobalException(BoardErrorCode.ALREADY_BOARD_MEMBER);
+        }
+    }
+
+    private void validedateLeaveMember(UserBoard userBoard, Long userId) { //회원 자진 탈퇴시 검증메서드
+        if(userBoard.getBoardAuthority().equals(BoardAuthority.ADMIN)){
+            if(userId.equals(null)){
+                throw new GlobalException(BoardErrorCode.REQUIRED_NEW_BOARD_ADMIN); //팀장일경우 권한을 넘겨줘야합니다.
+            }
+
+            User DelegateeUser = userService.findUser(userId);
+            UserBoard updateUserBoard = validateMember(DelegateeUser,userBoard.getBoard()); //테스트 해줘야함
+            updateUserBoard.UpdateAuthority(BoardAuthority.ADMIN);
+
         }
     }
 
