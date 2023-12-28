@@ -21,3 +21,7 @@ spring:
       init:
         mode: always
         encoding: UTF-8
+
+  jwt:
+    secret:
+      key: ${JWT_SECRET_KEY}
