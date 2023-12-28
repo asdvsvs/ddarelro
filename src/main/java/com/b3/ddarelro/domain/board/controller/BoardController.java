@@ -2,14 +2,21 @@ package com.b3.ddarelro.domain.board.controller;
 
 
 import com.b3.ddarelro.domain.board.dto.request.BoardCreateReq;
+import com.b3.ddarelro.domain.board.dto.request.BoardDropReq;
+import com.b3.ddarelro.domain.board.dto.request.BoardInviteReq;
+import com.b3.ddarelro.domain.board.dto.request.BoardLeaveReq;
 import com.b3.ddarelro.domain.board.dto.request.BoardUpdateReq;
 import com.b3.ddarelro.domain.board.dto.response.BoardCreateRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardDeleteRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardDetailRes;
+import com.b3.ddarelro.domain.board.dto.response.BoardDropRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardInviteRes;
+import com.b3.ddarelro.domain.board.dto.response.BoardLeaveRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardPriviewRes;
+import com.b3.ddarelro.domain.board.dto.response.BoardRestoreRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardUpdateRes;
 import com.b3.ddarelro.domain.board.service.BoardService;
+import com.b3.ddarelro.global.security.UserDetailsImpl;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,6 +29,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -33,7 +41,7 @@ public class BoardController {
 
     @PostMapping
     public ResponseEntity<BoardCreateRes> createBoard(
-        //@AuthenticationPrincipal UserDetailsImpl userDetails,
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
         @RequestBody BoardCreateReq reqDto
         ){
 
@@ -45,7 +53,7 @@ public class BoardController {
 
     @PatchMapping("/{boardId}")
     public ResponseEntity<BoardUpdateRes> updateBoard(
-        //@AuthenticationPrincipal UserDetailsImpl userDetails,
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable Long boardId,
         @RequestBody BoardUpdateReq reqDto
     ){
@@ -58,7 +66,7 @@ public class BoardController {
 
     @DeleteMapping("/{boardId}")
     public ResponseEntity<BoardDeleteRes> deleteBoard(
-        //@AuthenticationPrincipal UserDetailsImpl userDetails,
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable Long boardId
     ){
 
@@ -68,12 +76,29 @@ public class BoardController {
             .body(resDto);
     }
 
+    @PatchMapping("/{boardId}/restore")
+    public ResponseEntity<BoardRestoreRes> restoreBoard(
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
+        @PathVariable Long boardId
+    ){
+
+        BoardRestoreRes resDto = boardService.restoreBoard(userDetails.getUser().getId(),boardId);
+
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(resDto);
+    }
+
 
 
     @GetMapping
-    public ResponseEntity<List<BoardPriviewRes>> getBoardListAll(){ //보드 목록 조회
+    public ResponseEntity<List<BoardPriviewRes>> getBoardListAll(
+        @RequestParam(value = "sortBy",defaultValue = "createdAt") String sortBy,
+        @RequestParam(value = "isAsc",defaultValue = "false") boolean isAsc
+    )
+
+    { //보드 목록 조회
         return ResponseEntity.status(HttpStatus.OK)
-            .body(boardService.getBoardList());
+            .body(boardService.getBoardList(isAsc,sortBy));
     }
 
     @GetMapping("/boardId")
@@ -88,32 +113,48 @@ public class BoardController {
 
     }
 
-    @PostMapping("/{boardId}/members/{userId}")
+    @PostMapping("/{boardId}/invitation}")
     public  ResponseEntity<BoardInviteRes> inviteMember(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable Long boardId,
-        @PathVariable Long userId
+        @RequestBody BoardInviteReq req
     ){
 
-        BoardInviteRes resDto = boardService.inviteMember(userDetails.getUser().getId(),boardId,userId);
+        BoardInviteRes resDto = boardService.inviteMember(userDetails.getUser().getId(),boardId,req);
 
         return ResponseEntity.status(HttpStatus.OK)
             .body(resDto);
 
     }
-    @DeleteMapping("/{boardId}/members/{userId}")
-    public  ResponseEntity<BoardInviteRes> dropMember(
+    @DeleteMapping("/{boardId}/drop") //팀장이 멤버 탈퇴시키기
+    public  ResponseEntity<BoardDropRes> dropMember(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable Long boardId,
-        @PathVariable Long userId
+        @RequestBody BoardDropReq req
     ){
 
-        BoardInviteRes resDto = boardService.dropMember(userDetails.getUser().getId(),boardId,userId);
+        BoardDropRes resDto = boardService.dropMember(userDetails.getUser().getId(),boardId,req);
 
         return ResponseEntity.status(HttpStatus.OK)
             .body(resDto);
 
     }
+
+    @DeleteMapping("/{boardId}/leave") //자기자신이 탈퇴
+    public  ResponseEntity<BoardLeaveRes> leaveBoard(
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
+        @PathVariable Long boardId,
+        @RequestBody BoardLeaveReq req
+    ){
+
+        BoardLeaveRes resDto = boardService.leaveBoard(userDetails.getUser().getId(),boardId,req);
+
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(resDto);
+
+    }
+
+
 
 
 

@@ -51,7 +51,7 @@ public class Board extends BaseEntity {
         userBoard.setBoard(this);
     }
 
-    public void deleteBoardState(Boolean bool){
+    public void updateBoardState(Boolean bool){
         this.deleted = bool;
     }
 
