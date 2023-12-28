@@ -10,8 +10,8 @@ public record UserSignupReq(
     )
     String email,
 
-    @NotBlank( message = "닉네임을 입력해주세요")
-    String nickname,
+    @NotBlank( message = "유저명을 입력해주세요")
+    String username,
 
     @Pattern(
         regexp = "^[a-zA-Z0-9]{4,15}$",

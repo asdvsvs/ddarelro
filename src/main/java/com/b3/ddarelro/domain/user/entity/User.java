@@ -26,7 +26,7 @@ public class User extends BaseEntity {
     private String email;
 
     @Column (nullable = false, unique = true)
-    private String nickname;
+    private String username;
 
     @Column (nullable = false)
     private String password;
@@ -35,9 +35,9 @@ public class User extends BaseEntity {
     private Boolean Deleted;
 
     @Builder
-    private User(String email,String nickname,String password) {
+    private User(String email,String username,String password) {
         this.email = email;
-        this.nickname = nickname;
+        this.username = username;
         this.password = password;
         this.Deleted = false;
     }
