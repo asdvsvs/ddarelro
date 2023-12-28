@@ -3,10 +3,12 @@ package com.b3.ddarelro.domain.column.controller;
 import com.b3.ddarelro.domain.column.dto.request.ColumnCreateReq;
 import com.b3.ddarelro.domain.column.dto.request.ColumnDeleteReq;
 import com.b3.ddarelro.domain.column.dto.request.ColumnGetReq;
+import com.b3.ddarelro.domain.column.dto.request.ColumnMoveReq;
 import com.b3.ddarelro.domain.column.dto.request.ColumnRestoreReq;
 import com.b3.ddarelro.domain.column.dto.request.ColumnUpdateReq;
 import com.b3.ddarelro.domain.column.dto.response.ColumnCreateRes;
 import com.b3.ddarelro.domain.column.dto.response.ColumnDeleteRes;
+import com.b3.ddarelro.domain.column.dto.response.ColumnMoveRes;
 import com.b3.ddarelro.domain.column.dto.response.ColumnRestoreRes;
 import com.b3.ddarelro.domain.column.dto.response.ColumnUpdateRes;
 import com.b3.ddarelro.domain.column.dto.response.ColumnsGetRes;
@@ -73,6 +75,14 @@ public class ColumnController {
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
         ColumnRestoreRes res = columnService.restoreColumn(columnId, req,
             userDetails.getUser().getId());
+        return ResponseEntity.status(HttpStatus.OK).body(res);
+    }
+
+    @PutMapping("/{columnId}/move")
+    public ResponseEntity<ColumnMoveRes> moveColumn(@PathVariable Long columnId,
+        @Valid @RequestBody ColumnMoveReq req,
+        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        ColumnMoveRes res = columnService.moveColumn(columnId, req, userDetails.getUser().getId());
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 

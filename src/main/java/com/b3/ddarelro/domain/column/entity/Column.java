@@ -54,4 +54,8 @@ public class Column extends BaseEntity {
     public void restore() {
         this.deleted = false;
     }
+
+    public void move(Long move) {
+        this.priority = move;
+    }
 }

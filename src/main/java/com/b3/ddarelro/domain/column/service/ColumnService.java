@@ -5,10 +5,12 @@ import com.b3.ddarelro.domain.board.service.BoardService;
 import com.b3.ddarelro.domain.column.dto.request.ColumnCreateReq;
 import com.b3.ddarelro.domain.column.dto.request.ColumnDeleteReq;
 import com.b3.ddarelro.domain.column.dto.request.ColumnGetReq;
+import com.b3.ddarelro.domain.column.dto.request.ColumnMoveReq;
 import com.b3.ddarelro.domain.column.dto.request.ColumnRestoreReq;
 import com.b3.ddarelro.domain.column.dto.request.ColumnUpdateReq;
 import com.b3.ddarelro.domain.column.dto.response.ColumnCreateRes;
 import com.b3.ddarelro.domain.column.dto.response.ColumnDeleteRes;
+import com.b3.ddarelro.domain.column.dto.response.ColumnMoveRes;
 import com.b3.ddarelro.domain.column.dto.response.ColumnRestoreRes;
 import com.b3.ddarelro.domain.column.dto.response.ColumnUpdateRes;
 import com.b3.ddarelro.domain.column.dto.response.ColumnsGetRes;
@@ -19,6 +21,7 @@ import com.b3.ddarelro.domain.user.entity.User;
 import com.b3.ddarelro.domain.user.service.UserService;
 import com.b3.ddarelro.global.exception.GlobalException;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -101,6 +104,44 @@ public class ColumnService {
             .title(column.getTitle())
             .deleted(column.getDeleted())
             .build();
+    }
+
+    @Transactional
+    public ColumnMoveRes moveColumn(Long columnId, ColumnMoveReq req, Long userId) {
+        getBoardAndLeaderCheck(req.boardId(), userId);
+
+        Column column = findColumn(columnId);
+
+        changePriority(req.move(), column, req.boardId());
+
+        return ColumnMoveRes.builder()
+            .ColumnId(column.getId())
+            .priority(column.getPriority())
+            .title(column.getTitle())
+            .build();
+    }
+
+    private void changePriority(Long move, Column column, Long boardId) {
+        move = convertMove(move, boardId);
+        if (Objects.equals(column.getPriority(), move)) {
+            throw new GlobalException(ColumnErrorCode.CANNOT_BE_SAME_PRIORITY);
+        }
+        Long moveDirection = column.getPriority() > move ? 1L : -1L;
+        Long start = moveDirection == -1L ? column.getPriority() : move;
+        Long end = moveDirection == -1L ? move : column.getPriority();
+
+        columnRepository.moveAnotherColumns(start, end, moveDirection);
+        column.move(move);
+    }
+
+    private Long convertMove(Long move, Long boardId) {
+        Long columnCount = columnRepository.countByBoardId(boardId);
+        if (move < 1) {
+            move = 1L;
+        } else if (move > columnCount) {
+            move = columnCount;
+        }
+        return move;
     }
 
     public Column findColumn(Long columnId) {

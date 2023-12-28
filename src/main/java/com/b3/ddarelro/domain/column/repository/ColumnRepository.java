@@ -32,4 +32,9 @@ public interface ColumnRepository extends JpaRepository<Column, Long> {
         + "set c.deleted=false "
         + "where c.id in (:columnIdList)")
     void softRestore(List<Long> columnIdList);
+
+    @Modifying
+    @Query("update Column c set c.priority = c.priority + :moveDirection "
+        + "where c.priority between :start and :end")
+    void moveAnotherColumns(Long start, Long end, Long moveDirection);
 }
