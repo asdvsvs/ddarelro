@@ -18,7 +18,7 @@ public class CardDeleteRestoreService {
         cardRepository.SoftDelete(columnIds);
     }
 
-    public void restoreAllComment(List<Long> columnIds) {
+    public void restoreAllCard(List<Long> columnIds) {
         cardRepository.restoreAll(columnIds);
     }
 }
