@@ -136,10 +136,6 @@ public class BoardService {
 
         Long invitedUserId = req.getUserId();
 
-        if(invitedUserId.equals(userId)){
-            throw new GlobalException(BoardErrorCode.FORBIDDEN_INVITE_OWN);
-        }
-
         User founddUser = userService.findUser(userId);
 
         User invitedUser = userService.findUser(invitedUserId);
@@ -232,12 +228,6 @@ public class BoardService {
 
         return userBoardRepository.findByUserAndBoard(user,board)
             .orElseThrow(()->new GlobalException(BoardErrorCode.NOT_BOARD_MEMBER));
-    }
-
-    private void validateInviteOwn(Long userId, Long otherUserId){ //자기 자신을 초대하는지확인
-        if(userId.equals(otherUserId)){
-            throw new GlobalException(BoardErrorCode.FORBIDDEN_INVITE_OWN);
-        }
     }
 
     private void validateExistedMember(User user, Board board){ // 이미 가입되어있느 멤버인지 확인
