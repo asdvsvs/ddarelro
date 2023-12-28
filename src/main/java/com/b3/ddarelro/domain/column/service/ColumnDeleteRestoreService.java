@@ -19,4 +19,10 @@ public class ColumnDeleteRestoreService {
         columnRepository.softDelete(columnIdList);
 //        cardDeleteRestoreService.deleteAllCard(columnIdList);
     }
+
+    public void restoreAllColumn(Long boardId) {
+        List<Long> columnIdList = columnRepository.findAllByBoardIdAndDeleted(boardId);
+        columnRepository.softRestore(columnIdList);
+//        cardDeleteRestoreService.restoreAllCard(columnIdList);
+    }
 }
