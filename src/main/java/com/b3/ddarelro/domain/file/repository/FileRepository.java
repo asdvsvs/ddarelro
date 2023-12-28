@@ -14,10 +14,10 @@ public interface FileRepository extends JpaRepository<File, Long> {
 
 
     @Modifying
-    @Query(value = "update UploadFile f set f.deleted = true where f.card.id in (:fileIds)")
+    @Query(value = "update File f set f.deleted = true where f.card.id in (:fileIds)")
     void SoftDelete(List<Long> fileIds);
 
     @Modifying
-    @Query(value = "update UploadFile f set f.deleted = false where f.card.id in (:fileIds)")
+    @Query(value = "update File f set f.deleted = false where f.card.id in (:fileIds)")
     void restoreAll(List<Long> fileIds);
 }
