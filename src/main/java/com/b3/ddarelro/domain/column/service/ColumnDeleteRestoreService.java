@@ -11,12 +11,12 @@ import org.springframework.stereotype.Service;
 public class ColumnDeleteRestoreService {
 
     private final ColumnRepository columnRepository;
-    private final CardDeleteRestoreService cardDeleteRestoreService;
+//    private final CardDeleteRestoreService cardDeleteRestoreService;
 
     public void deleteAllColumn(Long boardId) {
         List<Column> columns = columnRepository.findAllByBoardId(boardId);
         List<Long> columnIdList = columns.stream().map(Column::getId).toList();
         columns.forEach(Column::delete);
-        cardDeleteRestoreService.deleteAllCard(columnIdList);
+//        cardDeleteRestoreService.deleteAllCard(columnIdList);
     }
 }
