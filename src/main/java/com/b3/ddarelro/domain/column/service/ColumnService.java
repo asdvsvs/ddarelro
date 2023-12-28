@@ -2,6 +2,7 @@ package com.b3.ddarelro.domain.column.service;
 
 import com.b3.ddarelro.domain.board.entity.Board;
 import com.b3.ddarelro.domain.board.service.BoardService;
+import com.b3.ddarelro.domain.card.service.CardService;
 import com.b3.ddarelro.domain.column.dto.request.ColumnCreateReq;
 import com.b3.ddarelro.domain.column.dto.request.ColumnDeleteReq;
 import com.b3.ddarelro.domain.column.dto.request.ColumnGetReq;
@@ -27,6 +28,7 @@ public class ColumnService {
     private final ColumnRepository columnRepository;
     private final BoardService boardService;
     private final UserService userService;
+    private final CardService cardService;
 
     public ColumnCreateRes createColumn(ColumnCreateReq req, Long userId) {
         Board board = getBoardAndLeaderCheck(req.boardId(), userId);
@@ -77,11 +79,19 @@ public class ColumnService {
 
         Column column = findColumn(columnId);
         column.delete();
+        cardService.deleteAllCard(List.of(columnId));
 
         return ColumnDeleteRes.builder()
             .title(column.getTitle())
             .deleted(column.getDeleted())
             .build();
+    }
+
+    public void deleteAllColumn(Long boardId) {
+        List<Column> columns = columnRepository.findAllByBoardId(boardId);
+        List<Long> columnIdList = columns.stream().map(Column::getId).toList();
+        columns.forEach(Column::delete);
+        cardService.deleteAllCard(columnIdList);
     }
 
     public Column findColumn(Long columnId) {
