@@ -5,8 +5,6 @@ import com.b3.ddarelro.domain.card.dto.response.*;
 import com.b3.ddarelro.domain.card.entity.*;
 import com.b3.ddarelro.domain.card.exception.*;
 import com.b3.ddarelro.domain.card.repository.*;
-import com.b3.ddarelro.domain.column.entity.*;
-import com.b3.ddarelro.domain.column.exception.*;
 import com.b3.ddarelro.domain.column.service.*;
 import com.b3.ddarelro.domain.comment.service.*;
 import com.b3.ddarelro.domain.user.entity.*;
@@ -32,7 +30,7 @@ public class CardService {
     public CardCreateRes createCard(CardCreateReq req, User user) {
         userService.findUser(user.getId());
         Long columnId = req.columnId();
-        checkColumnDeleted(columnId);
+        columnService.findColumn(columnId);
 
         Long priority = cardRepository.countByColumnId(req.columnId()) + 1;
 
@@ -50,7 +48,7 @@ public class CardService {
     public List<CardListRes> getCardList(CardListReq req, User user) {
         userService.findUser(user.getId());
         Long columnId = req.columnId();
-        checkColumnDeleted(columnId);
+        columnService.findColumn(columnId);
 
         List<Card> cardList = cardRepository.findAllByOrderByCreatedAtDesc();
 
@@ -58,10 +56,11 @@ public class CardService {
             .collect(Collectors.toList());
     }
 
+    @Transactional
     public CardRes getCard(Long cardId, CardReq req, User user) {
         userService.findUser(user.getId());
         Long columnId = req.columnId();
-        checkColumnDeleted(columnId);
+        columnService.findColumn(columnId);
 
         Card card = findCard(cardId);
 
@@ -72,7 +71,7 @@ public class CardService {
     public CardModifyRes modifyCard(Long cardId, CardModifyReq req, User user) {
         userService.findUser(user.getId());
         Long columnId = req.columnId();
-        checkColumnDeleted(columnId);
+        columnService.findColumn(columnId);
 
         Card card = findCard(cardId);
 
@@ -84,7 +83,7 @@ public class CardService {
     public CardDueDateRes setDueDateCard(Long cardId, CardDueDateReq req, User user) {
         userService.findUser(user.getId());
         Long columnId = req.columnId();
-        checkColumnDeleted(columnId);
+        columnService.findColumn(columnId);
 
         Card card = findCard(cardId);
 
@@ -98,7 +97,7 @@ public class CardService {
     public CardDeleteRes deleteCard(Long cardId, CardDeleteReq req, User user) {
         userService.findUser(user.getId());
         Long columnId = req.columnId();
-        checkColumnDeleted(columnId);
+        columnService.findColumn(columnId);
 
         Card card = getUserCard(cardId, user);
         card.deleteCard();
@@ -106,13 +105,6 @@ public class CardService {
         List<Long> cardIdList = cardList.stream().map(Card::getId).toList();
         commentDeleteRestoreService.deleteAllComment(cardIdList);
         return CardDeleteRes.builder().msg("카드가 삭제 됬어요!").build();
-    }
-
-    private void checkColumnDeleted(Long columnId) {
-        Column column = columnService.findColumn(columnId);
-        if (column.getDeleted()) {
-            throw new GlobalException(ColumnErrorCode.IS_DELETED);
-        }
     }
 
 
