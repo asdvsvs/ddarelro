@@ -41,4 +41,10 @@ public class UserService {
 
         userRepository.save(user);
     }
+
+    public User findUser(final Long id) {
+        User user = userRepository.findById(id)
+            .orElseThrow(() -> new GlobalException(UserErrorCode.NOT_FOUND_USER));
+        return user;
+    }
 }
