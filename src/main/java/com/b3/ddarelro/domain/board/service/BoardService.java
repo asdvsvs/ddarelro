@@ -74,13 +74,8 @@ public class BoardService {
 
         validteUserAuthority(founddUser, foundBoard);
 
-        Board board = Board.builder()
-            .color(reqDto.getColor())
-            .name(reqDto.getName())
-            .description(reqDto.getDescription())
-            .build();
-
-        return new BoardUpdateRes(board);
+        foundBoard.update(reqDto);
+        return new BoardUpdateRes(foundBoard);
     }
 
     public BoardDeleteRes deleteBoard(Long boardId, Long userId) {
