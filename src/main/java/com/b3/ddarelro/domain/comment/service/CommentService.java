@@ -58,7 +58,7 @@ public class CommentService {
 
     public List<CommentListRes> getComments(CommentListReq req) {
         Card card = cardService.findCard(req.cardId());
-        List<Comment> comments = commentRepository.findAllByCardOrderByCreatedAtDesc(card);
+        List<Comment> comments = commentRepository.findAllByFetchJoinUser(card);
         return comments.stream()
             .map(comment -> CommentListRes.builder()
                 .id(comment.getId())

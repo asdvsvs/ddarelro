@@ -9,7 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
-    List<Comment> findAllByCardOrderByCreatedAtDesc(Card card);
+    @Query("select c from Card c join fetch c.user order by c.createdAt desc")
+    List<Comment> findAllByFetchJoinUser(Card card);
 
     @Modifying
     @Query(value = "update Comment c set c.deleted = true where c.card.id in (:cardIds)")
