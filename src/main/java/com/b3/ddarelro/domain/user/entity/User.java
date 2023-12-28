@@ -22,23 +22,27 @@ public class User extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column (nullable = false, unique = true)
+    @Column(nullable = false, unique = true)
     private String email;
 
-    @Column (nullable = false, unique = true)
+    @Column(nullable = false, unique = true)
     private String username;
 
-    @Column (nullable = false)
+    @Column(nullable = false)
     private String password;
 
-    @Column (nullable = false)
+    @Column(nullable = false)
     private Boolean Deleted;
 
     @Builder
-    private User(String email,String username,String password) {
+    private User(String email, String username, String password) {
         this.email = email;
         this.username = username;
         this.password = password;
         this.Deleted = false;
+    }
+
+    public void updateUsername(String username) {
+        this.username = username;
     }
 }
