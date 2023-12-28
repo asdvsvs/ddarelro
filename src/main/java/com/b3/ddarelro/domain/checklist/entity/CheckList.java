@@ -40,4 +40,8 @@ public class CheckList extends BaseEntity {
         this.completed = false;
         this.deleted = false;
     }
+
+    public void completeToggle() {
+        this.completed = !completed;
+    }
 }

@@ -3,6 +3,7 @@ package com.b3.ddarelro.domain.checklist.controller;
 import static org.springframework.http.HttpStatus.CREATED;
 
 import com.b3.ddarelro.domain.checklist.dto.request.CheckListCreateReq;
+import com.b3.ddarelro.domain.checklist.dto.response.CheckListCompletedRes;
 import com.b3.ddarelro.domain.checklist.dto.response.CheckListCreateRes;
 import com.b3.ddarelro.domain.checklist.dto.response.CheckListGetListRes;
 import com.b3.ddarelro.domain.checklist.service.CheckListService;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,6 +36,14 @@ public class CheckListController {
     @GetMapping("/{cardId}/checkList")
     public ResponseEntity<CheckListGetListRes> getCheckList(@PathVariable Long cardId) {
         CheckListGetListRes res = checkListService.getCheckList(cardId);
+        return ResponseEntity.ok(res);
+    }
+
+    @PutMapping("/checkList/{checkListId}")
+    public ResponseEntity<CheckListCompletedRes> completedCheckList(
+        @PathVariable Long checkListId) {
+
+        CheckListCompletedRes res = checkListService.completedCheckList(checkListId);
         return ResponseEntity.ok(res);
     }
 }
