@@ -50,4 +50,8 @@ public class Column extends BaseEntity {
     public void delete() {
         this.deleted = true;
     }
+
+    public void restore() {
+        this.deleted = false;
+    }
 }
