@@ -55,7 +55,7 @@ public class ColumnService {
 
         boardService.validateMember(user, board);
 
-        List<Column> columns = columnRepository.findAllByBoardId(board.getId());
+        List<Column> columns = columnRepository.findAllByBoardIdAndNotDeleted(board.getId());
 
         return columns.stream().map(column -> ColumnsGetRes.builder()
             .title(column.getTitle()).build()).toList();

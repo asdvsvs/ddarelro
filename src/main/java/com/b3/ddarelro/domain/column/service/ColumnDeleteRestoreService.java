@@ -14,7 +14,7 @@ public class ColumnDeleteRestoreService {
 //    private final CardDeleteRestoreService cardDeleteRestoreService;
 
     public void deleteAllColumn(Long boardId) {
-        List<Column> columns = columnRepository.findAllByBoardId(boardId);
+        List<Column> columns = columnRepository.findAllByBoardIdAndNotDeleted(boardId);
         List<Long> columnIdList = columns.stream().map(Column::getId).toList();
         columnRepository.softDelete(columnIdList);
 //        cardDeleteRestoreService.deleteAllCard(columnIdList);

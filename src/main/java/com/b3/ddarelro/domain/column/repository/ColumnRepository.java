@@ -11,7 +11,7 @@ public interface ColumnRepository extends JpaRepository<Column, Long> {
         + "join fetch c.board b "
         + "where b.id = :boardId and c.deleted = false "
         + "order by c.priority")
-    List<Column> findAllByBoardId(Long boardId);
+    List<Column> findAllByBoardIdAndNotDeleted(Long boardId);
 
     @Query("select count(*) from Column c "
         + "join c.board b "
