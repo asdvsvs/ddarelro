@@ -50,10 +50,8 @@ public class ColumnService {
     public List<ColumnsGetRes> getColumns(ColumnGetReq req, Long userId) {
         Board board = boardService.findBoard(req.boardId());
         User user = userService.findUser(userId);
-        List<User> boardUsers = board.getUsers();
-        if (!boardUsers.contains(user)) {
-            throw new GlobalException(ColumnErrorCode.INVALID_USER);
-        }
+
+        boardService.validateMember(user, board);
 
         List<Column> columns = columnRepository.findAllByBoardId(board.getId());
 
@@ -106,16 +104,7 @@ public class ColumnService {
     private Board getBoardAndLeaderCheck(Long boardId, Long userId) {
         Board board = boardService.findBoard(boardId);
         User user = userService.findUser(userId);
-        validateLeader(board, user);
+        boardService.validteUserAuthority(user, board);
         return board;
-    }
-
-    private void validateLeader(Board board, User user) {
-        List<User> boardUsers = board.getUsers();
-        User boardLeader = boardUsers.stream().filter(u -> u.getAuthority().equals(LEADER))
-            .findFirst();
-        if (boardLeader != user) {
-            throw new GlobalException(ColumnErrorCode.NOT_LEADER);
-        }
     }
 }
