@@ -56,7 +56,7 @@ public class BoardController {
     }
 
     @DeleteMapping("/{boardId}")
-    public ResponseEntity<BoardDeleteRes> updateBoard(
+    public ResponseEntity<BoardDeleteRes> deleteBoard(
         //@AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable Long boardId
     ){
