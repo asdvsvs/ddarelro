@@ -4,10 +4,12 @@ import static org.springframework.http.HttpStatus.CREATED;
 
 import com.b3.ddarelro.domain.checklist.dto.request.CheckListCreateReq;
 import com.b3.ddarelro.domain.checklist.dto.response.CheckListCreateRes;
+import com.b3.ddarelro.domain.checklist.dto.response.CheckListGetListRes;
 import com.b3.ddarelro.domain.checklist.service.CheckListService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,5 +29,11 @@ public class CheckListController {
 
         CheckListCreateRes res = checkListService.createCheckList(cardId, req);
         return ResponseEntity.status(CREATED).body(res);
+    }
+
+    @GetMapping("/{cardId}/checkList")
+    public ResponseEntity<CheckListGetListRes> getCheckList(@PathVariable Long cardId) {
+        CheckListGetListRes res = checkListService.getCheckList(cardId);
+        return ResponseEntity.ok(res);
     }
 }
