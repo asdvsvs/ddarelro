@@ -2,6 +2,7 @@ package com.b3.ddarelro.domain.board.controller;
 
 
 import com.b3.ddarelro.domain.board.dto.request.BoardCreateReq;
+import com.b3.ddarelro.domain.board.dto.request.BoardUpdateReq;
 import com.b3.ddarelro.domain.board.dto.response.BoardCreateRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardDeleteRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardDetailRes;
@@ -46,7 +47,7 @@ public class BoardController {
     public ResponseEntity<BoardUpdateRes> updateBoard(
         //@AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable Long boardId,
-        @RequestBody BoardCreateReq reqDto
+        @RequestBody BoardUpdateReq reqDto
     ){
 
         BoardUpdateRes resDto = boardService.updateBoard(boardId,userDetails.getUser().getId(),reqDto);
@@ -101,7 +102,7 @@ public class BoardController {
 
     }
     @DeleteMapping("/{boardId}/members/{userId}")
-    public  ResponseEntity<BoardInviteRes> inviteMember(
+    public  ResponseEntity<BoardInviteRes> dropMember(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable Long boardId,
         @PathVariable Long userId
