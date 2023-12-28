@@ -5,9 +5,11 @@ import com.b3.ddarelro.domain.board.service.BoardService;
 import com.b3.ddarelro.domain.column.dto.request.ColumnCreateReq;
 import com.b3.ddarelro.domain.column.dto.request.ColumnDeleteReq;
 import com.b3.ddarelro.domain.column.dto.request.ColumnGetReq;
+import com.b3.ddarelro.domain.column.dto.request.ColumnRestoreReq;
 import com.b3.ddarelro.domain.column.dto.request.ColumnUpdateReq;
 import com.b3.ddarelro.domain.column.dto.response.ColumnCreateRes;
 import com.b3.ddarelro.domain.column.dto.response.ColumnDeleteRes;
+import com.b3.ddarelro.domain.column.dto.response.ColumnRestoreRes;
 import com.b3.ddarelro.domain.column.dto.response.ColumnUpdateRes;
 import com.b3.ddarelro.domain.column.dto.response.ColumnsGetRes;
 import com.b3.ddarelro.domain.column.entity.Column;
@@ -28,7 +30,7 @@ public class ColumnService {
     private final ColumnRepository columnRepository;
     private final BoardService boardService;
     private final UserService userService;
-    //private final CardService cardService;
+//    private final CardDeleteRestoreService cardDeleteRestoreService;
 
     public ColumnCreateRes createColumn(ColumnCreateReq req, Long userId) {
         Board board = getBoardAndLeaderCheck(req.boardId(), userId);
@@ -53,7 +55,7 @@ public class ColumnService {
 
         boardService.validateMember(user, board);
 
-        List<Column> columns = columnRepository.findAllByBoardId(board.getId());
+        List<Column> columns = columnRepository.findAllByBoardIdAndNotDeleted(board.getId());
 
         return columns.stream().map(column -> ColumnsGetRes.builder()
             .title(column.getTitle()).build()).toList();
@@ -77,7 +79,7 @@ public class ColumnService {
 
         Column column = findColumn(columnId);
         column.delete();
-        //cardService.deleteAllCard(List.of(columnId));
+//        cardDeleteRestoreService.deleteAllCard(List.of(columnId));
 
         return ColumnDeleteRes.builder()
             .title(column.getTitle())
@@ -85,11 +87,18 @@ public class ColumnService {
             .build();
     }
 
-    public void deleteAllColumn(Long boardId) {
-        List<Column> columns = columnRepository.findAllByBoardId(boardId);
-        List<Long> columnIdList = columns.stream().map(Column::getId).toList();
-        columns.forEach(Column::delete);
-        //cardService.deleteAllCard(columnIdList);
+    @Transactional
+    public ColumnRestoreRes restoreColumn(Long columnId, ColumnRestoreReq req, Long userId) {
+        getBoardAndLeaderCheck(req.boardId(), userId);
+
+        Column column = findColumn(columnId);
+        column.restore();
+//        cardDeleteRestoreService.restoreAllCard(List.of(columnId));
+
+        return ColumnRestoreRes.builder()
+            .title(column.getTitle())
+            .deleted(column.getDeleted())
+            .build();
     }
 
     public Column findColumn(Long columnId) {
