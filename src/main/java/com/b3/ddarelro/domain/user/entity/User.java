@@ -1,6 +1,7 @@
 package com.b3.ddarelro.domain.user.entity;
 
 import com.b3.ddarelro.domain.common.BaseEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -21,21 +22,23 @@ public class User extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column (nullable = false, unique = true)
     private String email;
 
-    private String password;
-
+    @Column (nullable = false, unique = true)
     private String nickname;
 
+    @Column (nullable = false)
+    private String password;
+
+    @Column (nullable = false)
     private Boolean Deleted;
 
     @Builder
-    public User(String email,String nickname,String password) {
+    private User(String email,String nickname,String password) {
         this.email = email;
         this.nickname = nickname;
-        this.Deleted = false;
         this.password = password;
+        this.Deleted = false;
     }
-
-
 }
