@@ -61,7 +61,7 @@ public class ColumnService {
 
     @Transactional
     public ColumnUpdateRes updateColumn(Long columnId, ColumnUpdateReq req, Long userId) {
-        Board board = getBoardAndLeaderCheck(req.boardId(), userId);
+        getBoardAndLeaderCheck(req.boardId(), userId);
 
         Column column = findColumn(columnId);
         column.update(req.title());
@@ -73,7 +73,7 @@ public class ColumnService {
 
     @Transactional
     public ColumnDeleteRes deleteColumn(Long columnId, ColumnDeleteReq req, Long userId) {
-        Board board = getBoardAndLeaderCheck(req.boardId(), userId);
+        getBoardAndLeaderCheck(req.boardId(), userId);
 
         Column column = findColumn(columnId);
         column.delete();
