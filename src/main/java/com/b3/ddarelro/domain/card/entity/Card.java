@@ -1,26 +1,13 @@
 package com.b3.ddarelro.domain.card.entity;
 
-import com.b3.ddarelro.domain.card.dto.request.CardModifyReq;
-import com.b3.ddarelro.domain.comment.entity.Comment;
-import com.b3.ddarelro.domain.common.BaseEntity;
-import com.b3.ddarelro.domain.user.entity.User;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import java.time.LocalDate;
-import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.b3.ddarelro.domain.card.dto.request.*;
+import com.b3.ddarelro.domain.comment.entity.*;
+import com.b3.ddarelro.domain.common.*;
+import com.b3.ddarelro.domain.user.entity.*;
+import jakarta.persistence.*;
+import java.time.*;
+import java.util.*;
+import lombok.*;
 
 @Entity
 @Getter
@@ -40,20 +27,25 @@ public class Card extends BaseEntity {
     private String color;
     private LocalDate dueDate;
     private Boolean deleted;
+    private Long priority;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-    @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    private com.b3.ddarelro.domain.column.entity.Column column;
+    @OneToMany(mappedBy = "card")
     private List<Comment> commentList;
 
     @Builder
-    public Card(String name, String description, String color, Boolean deleted, User user,
+    public Card(String name, String description, String color, Boolean deleted, Long priority,
+        User user,
         List<Comment> commentList) {
         this.name = name;
         this.description = description;
         this.color = color;
         this.deleted = deleted;
+        this.priority = priority;
         this.user = user;
         this.commentList = commentList;
     }
