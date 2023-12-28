@@ -20,14 +20,14 @@ public class CardService {
 //    private final ColumnService columnService;
 //    private final UserService userService;
 
-    public CardCreateRes createCard(CardCreateReq reqDto) {
+    public CardCreateRes createCard(CardCreateReq req) {
         //TODO 컬럼 deleted 확인
 //        columnService.findColumn(reqDto.getColumnId()).orElseThrow(() -> new GlobalException());
         Card newCard = Card.builder()
-            .name(reqDto.name())
+            .name(req.name())
             //.user(user)
-            .description(reqDto.description())
-            .color(reqDto.color())
+            .description(req.description())
+            .color(req.color())
             .build();
         cardRepository.save(newCard);
         return CardCreateRes.formingWith(newCard);
@@ -51,13 +51,20 @@ public class CardService {
         return CardRes.formWith(card);
     }
 
-    public CardModifyRes modifyCard(Long cardId, CardModifyReq reqDto) {
+    public CardModifyRes modifyCard(Long cardId, CardModifyReq req) {
         //TODO 컬럼 deleted 확인
         Card card = findCard(cardId);
         //findUser(user, card);
-        card.modifyCard(reqDto);
+        card.modifyCard(req);
         return CardModifyRes.formWith(card);
     }
+
+    //TODO : 마감일 지정
+//    public CardDueDateRes setDueDateCard(Long cardId, CardDueDateReq req) {
+//        Card card = findCard(cardId);
+//        card.
+//
+//    }
 
     public CardDeleteRes deleteCard(Long cardId, CardDeleteReq req) {
         //TODO 컬럼 deleted 확인
