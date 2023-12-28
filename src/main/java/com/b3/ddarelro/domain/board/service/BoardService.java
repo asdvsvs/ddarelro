@@ -20,6 +20,7 @@ import com.b3.ddarelro.domain.board.exception.BoardErrorCode;
 import com.b3.ddarelro.domain.board.repository.BoardRepository;
 import com.b3.ddarelro.domain.column.service.ColumnService;
 import com.b3.ddarelro.domain.user.entity.User;
+import com.b3.ddarelro.domain.user.service.UserService;
 import com.b3.ddarelro.domain.userboard.entity.BoardAuthority;
 import com.b3.ddarelro.domain.userboard.entity.UserBoard;
 import com.b3.ddarelro.domain.userboard.repository.UserBoardRepository;
@@ -92,7 +93,7 @@ public class BoardService {
         validteUserAuthority(founddUser,foundBoard);
 
         foundBoard.updateBoardState(true);
-        columnService.deleteAllColumn(boardId);
+        //columnService.deleteAllColumn(boardId);
         return new BoardDeleteRes("삭제가 완료되었습니다.");
     }
 
@@ -188,7 +189,7 @@ public class BoardService {
         return new BoardDropRes("탈퇴처리되었습니다.");
     }
 
-    public BoardLeaveRes leaveBoard(Long userId, Long boarId, BoardLeaveReq req){
+    public BoardLeaveRes leaveBoard(Long userId, Long boardId, BoardLeaveReq req){
         User founddUser = userService.findUser(userId);
         Board foundBoard = findBoard(boardId);
 

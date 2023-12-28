@@ -9,12 +9,14 @@ import com.b3.ddarelro.domain.board.dto.request.BoardUpdateReq;
 import com.b3.ddarelro.domain.board.dto.response.BoardCreateRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardDeleteRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardDetailRes;
+import com.b3.ddarelro.domain.board.dto.response.BoardDropRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardInviteRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardLeaveRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardPriviewRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardRestoreRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardUpdateRes;
 import com.b3.ddarelro.domain.board.service.BoardService;
+import com.b3.ddarelro.global.security.UserDetailsImpl;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -39,7 +41,7 @@ public class BoardController {
 
     @PostMapping
     public ResponseEntity<BoardCreateRes> createBoard(
-        //@AuthenticationPrincipal UserDetailsImpl userDetails,
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
         @RequestBody BoardCreateReq reqDto
         ){
 
@@ -51,7 +53,7 @@ public class BoardController {
 
     @PatchMapping("/{boardId}")
     public ResponseEntity<BoardUpdateRes> updateBoard(
-        //@AuthenticationPrincipal UserDetailsImpl userDetails,
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable Long boardId,
         @RequestBody BoardUpdateReq reqDto
     ){
@@ -64,7 +66,7 @@ public class BoardController {
 
     @DeleteMapping("/{boardId}")
     public ResponseEntity<BoardDeleteRes> deleteBoard(
-        //@AuthenticationPrincipal UserDetailsImpl userDetails,
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable Long boardId
     ){
 
@@ -76,7 +78,7 @@ public class BoardController {
 
     @PatchMapping("/{boardId}/restore")
     public ResponseEntity<BoardRestoreRes> restoreBoard(
-        //@AuthenticationPrincipal UserDetailsImpl userDetails,
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable Long boardId
     ){
 
@@ -90,7 +92,7 @@ public class BoardController {
 
     @GetMapping
     public ResponseEntity<List<BoardPriviewRes>> getBoardListAll(
-        @RequestParam(value = "sortBy", defaultValue = "createdAt") String sortBy,
+        @RequestParam(value = "sortBy",defaultValue = "createdAt") String sortBy,
         @RequestParam(value = "isAsc",defaultValue = "false") boolean isAsc
     )
 
@@ -125,13 +127,13 @@ public class BoardController {
 
     }
     @DeleteMapping("/{boardId}/drop") //팀장이 멤버 탈퇴시키기
-    public  ResponseEntity<BoardInviteRes> dropMember(
+    public  ResponseEntity<BoardDropRes> dropMember(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable Long boardId,
         @RequestBody BoardDropReq req
     ){
 
-        BoardInviteRes resDto = boardService.dropMember(userDetails.getUser().getId(),boardId,req);
+        BoardDropRes resDto = boardService.dropMember(userDetails.getUser().getId(),boardId,req);
 
         return ResponseEntity.status(HttpStatus.OK)
             .body(resDto);
