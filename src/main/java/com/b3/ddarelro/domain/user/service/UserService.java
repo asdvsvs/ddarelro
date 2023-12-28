@@ -2,6 +2,7 @@ package com.b3.ddarelro.domain.user.service;
 
 
 import com.b3.ddarelro.domain.user.dto.request.UserSignupReq;
+import com.b3.ddarelro.domain.user.dto.response.UserRes;
 import com.b3.ddarelro.domain.user.entity.User;
 import com.b3.ddarelro.domain.user.exception.UserErrorCode;
 import com.b3.ddarelro.domain.user.repository.UserRepository;
@@ -27,7 +28,7 @@ public class UserService {
             throw new GlobalException(UserErrorCode.EXISTS_NICKNAME);
         }
 
-        if (!req.password().equals(req.passwordCheck())){
+        if (!req.password().equals(req.passwordCheck())) {
             throw new GlobalException(UserErrorCode.MISMATCH_PASSWORD);
         }
 
@@ -46,5 +47,14 @@ public class UserService {
         User user = userRepository.findById(id)
             .orElseThrow(() -> new GlobalException(UserErrorCode.NOT_FOUND_USER));
         return user;
+    }
+
+    public UserRes getUser(final Long userId) {
+        User user = findUser(userId);
+
+        return UserRes.builder()
+            .email(user.getEmail())
+            .Username(user.getUsername())
+            .build();
     }
 }
