@@ -285,10 +285,7 @@ public class BoardIntegrationTest {
     void 보드멤버탈퇴실패1() {
 
         User foundUser = userRepository.findById(user.getId()).orElse(null);
-        BoardLeaveReq req = BoardLeaveReq.builder()
-            .userId(null)
-            .build(); // 팀장이 탈퇴하지만 권한을 넘겨줄 유저아이디 입력X
-
+        BoardLeaveReq req = null;
         GlobalException exception = assertThrows(GlobalException.class, () -> {
             boardService.leaveBoard(foundUser.getId(), createdBoardId, req);
         });
