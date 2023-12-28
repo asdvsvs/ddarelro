@@ -24,7 +24,7 @@ public class Card extends BaseEntity {
     private String description;
     @Column(nullable = false)
     private String color;
-    private String dueDate;
+    private Date dueDate;
     private Boolean deleted;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -52,5 +52,8 @@ public class Card extends BaseEntity {
 
     public void deleteCard() {
         this.deleted = !this.deleted;
+    }
+
+    public Date setDueDate() {
     }
 }
