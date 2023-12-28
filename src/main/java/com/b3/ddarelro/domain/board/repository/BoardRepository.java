@@ -12,5 +12,6 @@ public interface BoardRepository extends JpaRepository<Board,Long> {
 
     Optional<Board> findByName(String name);
 
-    List<Board> findAll(Sort sort);
+    List<Board> findAllByDeletedFalse(Sort sort);
+
 }

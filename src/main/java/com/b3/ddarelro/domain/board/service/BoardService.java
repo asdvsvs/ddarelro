@@ -114,10 +114,9 @@ public class BoardService {
         Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
         Sort sort = Sort.by(direction, sortBy);
 
-        List<Board> boardList =  boardRepository.findAll(sort);
+        List<Board> boardList =  boardRepository.findAllByDeletedFalse(sort);
 
         return boardList.stream()
-            .filter(board -> board.getDeleted().equals(false))
             .map(BoardPriviewRes::new)
             .toList();
 
