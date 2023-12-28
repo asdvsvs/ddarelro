@@ -9,6 +9,7 @@ import com.b3.ddarelro.domain.column.dto.response.ColumnDeleteRes;
 import com.b3.ddarelro.domain.column.dto.response.ColumnUpdateRes;
 import com.b3.ddarelro.domain.column.dto.response.ColumnsGetRes;
 import com.b3.ddarelro.domain.column.service.ColumnService;
+import com.b3.ddarelro.global.security.UserDetailsImpl;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

@@ -1,13 +1,26 @@
 package com.b3.ddarelro.domain.card.entity;
 
-import com.b3.ddarelro.domain.card.dto.request.*;
-import com.b3.ddarelro.domain.comment.entity.*;
-import com.b3.ddarelro.domain.common.*;
-import com.b3.ddarelro.domain.user.entity.*;
-import jakarta.persistence.*;
-import java.time.*;
-import java.util.*;
-import lombok.*;
+import com.b3.ddarelro.domain.card.dto.request.CardModifyReq;
+import com.b3.ddarelro.domain.comment.entity.Comment;
+import com.b3.ddarelro.domain.common.BaseEntity;
+import com.b3.ddarelro.domain.user.entity.User;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import java.time.LocalDate;
+import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter

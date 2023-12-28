@@ -1,6 +1,5 @@
 package com.b3.ddarelro.domain.board.controller;
 
-
 import com.b3.ddarelro.domain.board.dto.request.BoardCreateReq;
 import com.b3.ddarelro.domain.board.dto.request.BoardDropReq;
 import com.b3.ddarelro.domain.board.dto.request.BoardInviteReq;
@@ -113,7 +112,7 @@ public class BoardController {
 
     }
 
-    @PostMapping("/{boardId}/invitation}")
+    @PostMapping("/{boardId}/invitation")
     public  ResponseEntity<BoardInviteRes> inviteMember(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable Long boardId,
