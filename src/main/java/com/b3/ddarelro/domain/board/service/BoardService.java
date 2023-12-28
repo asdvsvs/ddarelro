@@ -14,11 +14,9 @@ import com.b3.ddarelro.domain.board.dto.response.BoardLeaveRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardPriviewRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardRestoreRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardUpdateRes;
-
 import com.b3.ddarelro.domain.board.entity.Board;
 import com.b3.ddarelro.domain.board.exception.BoardErrorCode;
 import com.b3.ddarelro.domain.board.repository.BoardRepository;
-import com.b3.ddarelro.domain.column.service.ColumnService;
 import com.b3.ddarelro.domain.user.entity.User;
 import com.b3.ddarelro.domain.user.service.UserService;
 import com.b3.ddarelro.domain.userboard.entity.BoardAuthority;
@@ -39,12 +37,11 @@ public class BoardService {
     private final BoardRepository boardRepository;
     private final UserBoardRepository userBoardRepository;
     private final UserService userService;
-    private final ColumnService columnService;
+    //private final ColumnService columnService;
 
-    public BoardCreateRes createBoard(Long userId, BoardCreateReq reqDto){
+    public BoardCreateRes createBoard(Long userId, BoardCreateReq reqDto) {
 
         User findUser = userService.findUser(userId);
-
 
         Board board = Board.builder()
             .color(reqDto.getColor())
@@ -67,14 +64,14 @@ public class BoardService {
         return new BoardCreateRes(board);
     }
 
-    public BoardUpdateRes updateBoard(Long boardId, Long userId, BoardUpdateReq reqDto){
+    public BoardUpdateRes updateBoard(Long boardId, Long userId, BoardUpdateReq reqDto) {
 
         User founddUser = userService.findUser(userId);
         Board foundBoard = findBoard(boardId);
 
         //board 작성자가 맞는지확인
 
-        validteUserAuthority(founddUser,foundBoard);
+        validteUserAuthority(founddUser, foundBoard);
 
         Board board = Board.builder()
             .color(reqDto.getColor())
@@ -85,19 +82,19 @@ public class BoardService {
         return new BoardUpdateRes(board);
     }
 
-    public BoardDeleteRes deleteBoard(Long boardId,Long userId){
+    public BoardDeleteRes deleteBoard(Long boardId, Long userId) {
         User founddUser = userService.findUser(userId);
         Board foundBoard = findBoard(boardId);
 
         //board 작성자가 맞는지확인
-        validteUserAuthority(founddUser,foundBoard);
+        validteUserAuthority(founddUser, foundBoard);
 
         foundBoard.updateBoardState(true);
         //columnService.deleteAllColumn(boardId);
         return new BoardDeleteRes("삭제가 완료되었습니다.");
     }
 
-    public BoardRestoreRes restoreBoard(Long userId, Long boardId){
+    public BoardRestoreRes restoreBoard(Long userId, Long boardId) {
 
         User founddUser = userService.findUser(userId);
         Board foundBoard = findBoard(boardId);
@@ -110,18 +107,19 @@ public class BoardService {
     }
 
     @Transactional(readOnly = true)
-    public List<BoardPriviewRes> getBoardList(boolean isAsc,String sortBy) {
+    public List<BoardPriviewRes> getBoardList(boolean isAsc, String sortBy) {
 
         Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
         Sort sort = Sort.by(direction, sortBy);
 
-        List<Board> boardList =  boardRepository.findAllByDeletedFalse(sort);
+        List<Board> boardList = boardRepository.findAllByDeletedFalse(sort);
 
         return boardList.stream()
             .map(BoardPriviewRes::new)
             .toList();
 
     }
+
     @Transactional(readOnly = true)
     public BoardDetailRes getBoardOne(Long userId, Long boardId) {
 
@@ -129,14 +127,14 @@ public class BoardService {
 
         Board foundBoard = findBoard(boardId);
 
-        validateMember(founddUser,foundBoard);
+        validateMember(founddUser, foundBoard);
 
         validateDeleted(foundBoard);
 
         return new BoardDetailRes(foundBoard);
     }
 
-    public BoardInviteRes inviteMember(Long userId, Long boardId, BoardInviteReq req){
+    public BoardInviteRes inviteMember(Long userId, Long boardId, BoardInviteReq req) {
 
         Long invitedUserId = req.getUserId();
 
@@ -147,10 +145,9 @@ public class BoardService {
         Board foundBoard = findBoard(boardId);
 
         //user가 board 작성자가 맞는지 확인
-        validteUserAuthority(founddUser,foundBoard);
+        validteUserAuthority(founddUser, foundBoard);
 
-        validateExistedMember(invitedUser,foundBoard);  //초대할 사용자가 이미 초대된 멤버인지 확인
-
+        validateExistedMember(invitedUser, foundBoard);  //초대할 사용자가 이미 초대된 멤버인지 확인
 
         UserBoard userBoard = UserBoard.builder()
             .user(founddUser)
@@ -167,35 +164,33 @@ public class BoardService {
         return new BoardInviteRes("초대가 완료되었습니다.");
     }
 
-    public BoardDropRes dropMember(Long userId, Long boardId, BoardDropReq req){
+    public BoardDropRes dropMember(Long userId, Long boardId, BoardDropReq req) {
 
         Long dropUserId = req.getUserId();
 
-        if(dropUserId.equals(userId)){
+        if (dropUserId.equals(userId)) {
             throw new GlobalException(BoardErrorCode.FORBIDDEN_DROP_OWN);
         }
-
 
         User founddUser = userService.findUser(userId);
         User dropUser = userService.findUser(dropUserId);
         Board foundBoard = findBoard(boardId);
-        validteUserAuthority(founddUser,foundBoard);
+        validteUserAuthority(founddUser, foundBoard);
 
-        UserBoard userBoard = validateMember(dropUser,foundBoard); //탈퇴할 사용자가 멤버에 있는지 확인
+        UserBoard userBoard = validateMember(dropUser, foundBoard); //탈퇴할 사용자가 멤버에 있는지 확인
 
         userBoardRepository.delete(userBoard);
-
 
         return new BoardDropRes("탈퇴처리되었습니다.");
     }
 
-    public BoardLeaveRes leaveBoard(Long userId, Long boardId, BoardLeaveReq req){
+    public BoardLeaveRes leaveBoard(Long userId, Long boardId, BoardLeaveReq req) {
         User founddUser = userService.findUser(userId);
         Board foundBoard = findBoard(boardId);
 
-        UserBoard userBoard = validateMember(founddUser,foundBoard);
+        UserBoard userBoard = validateMember(founddUser, foundBoard);
 
-        validedateLeaveMember(userBoard,req.getUserId());
+        validedateLeaveMember(userBoard, req.getUserId());
 
         userBoardRepository.delete(userBoard);
 
@@ -203,58 +198,57 @@ public class BoardService {
     }
 
 
-
-    public Board findBoard(Long id){
+    public Board findBoard(Long id) {
         Board board = boardRepository.findById(id)
-            .orElseThrow(()->new GlobalException(BoardErrorCode.NOT_FOUND_BOARD));
+            .orElseThrow(() -> new GlobalException(BoardErrorCode.NOT_FOUND_BOARD));
 
-        if(board.getDeleted()){
+        if (board.getDeleted()) {
             throw new GlobalException(BoardErrorCode.NOT_FOUND_BOARD);
         }
         return board;
     }
 
-    public void validteUserAuthority(User foundUser,Board foundBoard) {
+    public void validteUserAuthority(User foundUser, Board foundBoard) {
         // 해당 보드,유저를 가지고있는 userBoard확인 후 권한을 가지고있는 유저인지 체크
-        UserBoard foundUserBoard = validateMember(foundUser,foundBoard);
-        if(foundUserBoard.getBoardAuthority() != BoardAuthority.ADMIN){
+        UserBoard foundUserBoard = validateMember(foundUser, foundBoard);
+        if (foundUserBoard.getBoardAuthority() != BoardAuthority.ADMIN) {
             throw new GlobalException(BoardErrorCode.UNAUTHORIZED_ACCESS_BOARD);
         }
     }
 
-    private void validateDeleted(Board board){ //이미 삭제된 보드인지 확인
-        if(board.getDeleted().equals(true)){
+    private void validateDeleted(Board board) { //이미 삭제된 보드인지 확인
+        if (board.getDeleted().equals(true)) {
             throw new GlobalException(BoardErrorCode.ALREADY_DELETED_BOARD);
         }
     }
 
-    public UserBoard validateMember(User user, Board board){ // 같은 user,board를 가지고있는 userboard가 있는지 확인
+    public UserBoard validateMember(User user,
+        Board board) { // 같은 user,board를 가지고있는 userboard가 있는지 확인
 
-        return userBoardRepository.findByUserAndBoard(user,board)
-            .orElseThrow(()->new GlobalException(BoardErrorCode.NOT_BOARD_MEMBER));
+        return userBoardRepository.findByUserAndBoard(user, board)
+            .orElseThrow(() -> new GlobalException(BoardErrorCode.NOT_BOARD_MEMBER));
     }
 
-    private void validateExistedMember(User user, Board board){ // 이미 가입되어있느 멤버인지 확인
-        if(userBoardRepository.existsByUserAndBoard(user,board)){
+    private void validateExistedMember(User user, Board board) { // 이미 가입되어있느 멤버인지 확인
+        if (userBoardRepository.existsByUserAndBoard(user, board)) {
             throw new GlobalException(BoardErrorCode.ALREADY_BOARD_MEMBER);
         }
     }
 
     private void validedateLeaveMember(UserBoard userBoard, Long userId) { //회원 자진 탈퇴시 검증메서드
-        if(userBoard.getBoardAuthority().equals(BoardAuthority.ADMIN)){
-            if(userId.equals(null)){
-                throw new GlobalException(BoardErrorCode.REQUIRED_NEW_BOARD_ADMIN); //팀장일경우 권한을 넘겨줘야합니다.
+        if (userBoard.getBoardAuthority().equals(BoardAuthority.ADMIN)) {
+            if (userId.equals(null)) {
+                throw new GlobalException(
+                    BoardErrorCode.REQUIRED_NEW_BOARD_ADMIN); //팀장일경우 권한을 넘겨줘야합니다.
             }
 
             User DelegateeUser = userService.findUser(userId);
-            UserBoard updateUserBoard = validateMember(DelegateeUser,userBoard.getBoard()); //테스트 해줘야함
+            UserBoard updateUserBoard = validateMember(DelegateeUser,
+                userBoard.getBoard()); //테스트 해줘야함
             updateUserBoard.UpdateAuthority(BoardAuthority.ADMIN);
 
         }
     }
-
-
-
 
 
 }

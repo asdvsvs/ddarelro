@@ -1,8 +1,8 @@
 package com.b3.ddarelro.domain.card.dto.response;
 
-import com.b3.ddarelro.domain.card.entity.*;
-import java.time.*;
-import lombok.*;
+import com.b3.ddarelro.domain.card.entity.Card;
+import java.time.LocalDateTime;
+import lombok.Builder;
 
 @Builder
 public record CardListRes(

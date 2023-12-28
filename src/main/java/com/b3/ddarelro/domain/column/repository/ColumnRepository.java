@@ -17,4 +17,9 @@ public interface ColumnRepository extends JpaRepository<Column, Long> {
         + "join c.board b "
         + "where b.id = :boardId")
     Long countByBoardId(Long boardId);
+
+    @Query("update Column c "
+        + "set c.deleted=true "
+        + "where c.id in (:columnIdList)")
+    void softDelete(List<Long> columnIdList);
 }

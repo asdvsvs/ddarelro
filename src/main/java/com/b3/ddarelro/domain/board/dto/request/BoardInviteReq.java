@@ -1,6 +1,5 @@
 package com.b3.ddarelro.domain.board.dto.request;
 
-import com.b3.ddarelro.domain.board.entity.Color;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -15,7 +14,7 @@ public class BoardInviteReq {
     private Long userId;
 
     @Builder
-    private BoardInviteReq(Long userId){
+    private BoardInviteReq(Long userId) {
         this.userId = userId;
     }
 

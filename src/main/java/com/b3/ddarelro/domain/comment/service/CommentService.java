@@ -13,6 +13,7 @@ import com.b3.ddarelro.domain.comment.entity.Comment;
 import com.b3.ddarelro.domain.comment.exception.CommentErrorCode;
 import com.b3.ddarelro.domain.comment.repository.CommentRepository;
 import com.b3.ddarelro.domain.user.entity.User;
+import com.b3.ddarelro.domain.user.service.UserService;
 import com.b3.ddarelro.global.exception.GlobalException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -67,7 +68,7 @@ public class CommentService {
             .map(comment -> CommentListRes.builder()
                 .id(comment.getId())
                 .content(comment.getContent())
-                .nickname(comment.getUser().getNickname())
+                .nickname(comment.getUser().getUsername())
                 .build())
             .toList();
     }
