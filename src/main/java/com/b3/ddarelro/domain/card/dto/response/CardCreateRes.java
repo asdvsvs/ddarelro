@@ -1,15 +1,18 @@
 package com.b3.ddarelro.domain.card.dto.response;
 
-import com.b3.ddarelro.domain.card.entity.*;
-import java.time.*;
-import lombok.*;
+import com.b3.ddarelro.domain.card.entity.Card;
+import java.time.LocalDateTime;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CardCreateRes {
 
     private String title;
-    //private String username;
+    //private String nickname;
     private String description;
     private String color;
     private LocalDateTime createdAt;
@@ -25,7 +28,7 @@ public class CardCreateRes {
     public static CardCreateRes formingWith(Card card) {
         return CardCreateRes.builder()
             .title(card.getName())
-            //.username(card.getUser().getUsername())
+            //.nickname(card.getUser().getUsername())
             .description(card.getDescription())
             .color(card.getColor())
             .createdAt(card.getCreatedAt())
