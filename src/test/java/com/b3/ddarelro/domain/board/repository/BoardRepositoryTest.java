@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.b3.ddarelro.domain.board.entity.Board;
-import com.b3.ddarelro.domain.board.entity.ColorEnum;
+import com.b3.ddarelro.domain.board.entity.Color;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,7 +25,7 @@ public class BoardRepositoryTest {
         //given
         Board board = Board.builder()
             .name("보드1")
-            .color(ColorEnum.BLACK)
+            .color(Color.BLACK)
             .description("테스트용 보드입니다.")
             .build();
 
