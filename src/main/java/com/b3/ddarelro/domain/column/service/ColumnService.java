@@ -2,7 +2,6 @@ package com.b3.ddarelro.domain.column.service;
 
 import com.b3.ddarelro.domain.board.entity.Board;
 import com.b3.ddarelro.domain.board.service.BoardService;
-import com.b3.ddarelro.domain.card.service.CardService;
 import com.b3.ddarelro.domain.column.dto.request.ColumnCreateReq;
 import com.b3.ddarelro.domain.column.dto.request.ColumnDeleteReq;
 import com.b3.ddarelro.domain.column.dto.request.ColumnGetReq;
@@ -15,6 +14,7 @@ import com.b3.ddarelro.domain.column.entity.Column;
 import com.b3.ddarelro.domain.column.exception.ColumnErrorCode;
 import com.b3.ddarelro.domain.column.repository.ColumnRepository;
 import com.b3.ddarelro.domain.user.entity.User;
+import com.b3.ddarelro.domain.user.service.UserService;
 import com.b3.ddarelro.global.exception.GlobalException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ public class ColumnService {
     private final ColumnRepository columnRepository;
     private final BoardService boardService;
     private final UserService userService;
-    private final CardService cardService;
+    //private final CardService cardService;
 
     public ColumnCreateRes createColumn(ColumnCreateReq req, Long userId) {
         Board board = getBoardAndLeaderCheck(req.boardId(), userId);
@@ -77,7 +77,7 @@ public class ColumnService {
 
         Column column = findColumn(columnId);
         column.delete();
-        cardService.deleteAllCard(List.of(columnId));
+        //cardService.deleteAllCard(List.of(columnId));
 
         return ColumnDeleteRes.builder()
             .title(column.getTitle())
@@ -89,7 +89,7 @@ public class ColumnService {
         List<Column> columns = columnRepository.findAllByBoardId(boardId);
         List<Long> columnIdList = columns.stream().map(Column::getId).toList();
         columns.forEach(Column::delete);
-        cardService.deleteAllCard(columnIdList);
+        //cardService.deleteAllCard(columnIdList);
     }
 
     public Column findColumn(Long columnId) {

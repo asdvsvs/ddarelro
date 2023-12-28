@@ -1,8 +1,9 @@
 package com.b3.ddarelro.domain.card.exception;
 
-import com.b3.ddarelro.global.exception.*;
-import lombok.*;
-import org.springframework.http.*;
+import com.b3.ddarelro.global.exception.ErrorCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 
 @Getter
 @RequiredArgsConstructor
