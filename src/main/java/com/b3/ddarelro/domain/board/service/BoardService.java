@@ -24,6 +24,7 @@ import com.b3.ddarelro.domain.userboard.entity.UserBoard;
 import com.b3.ddarelro.domain.userboard.repository.UserBoardRepository;
 import com.b3.ddarelro.global.exception.GlobalException;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -73,13 +74,8 @@ public class BoardService {
 
         validteUserAuthority(founddUser, foundBoard);
 
-        Board board = Board.builder()
-            .color(reqDto.getColor())
-            .name(reqDto.getName())
-            .description(reqDto.getDescription())
-            .build();
-
-        return new BoardUpdateRes(board);
+        foundBoard.update(reqDto);
+        return new BoardUpdateRes(foundBoard);
     }
 
     public BoardDeleteRes deleteBoard(Long boardId, Long userId) {
@@ -150,7 +146,7 @@ public class BoardService {
         validateExistedMember(invitedUser, foundBoard);  //초대할 사용자가 이미 초대된 멤버인지 확인
 
         UserBoard userBoard = UserBoard.builder()
-            .user(founddUser)
+            .user(invitedUser)
             .board(foundBoard)
             .authority(BoardAuthority.MEMBER)
             .build();
@@ -190,7 +186,7 @@ public class BoardService {
 
         UserBoard userBoard = validateMember(founddUser, foundBoard);
 
-        validedateLeaveMember(userBoard, req.getUserId());
+        validedateLeaveMember(userBoard, req);
 
         userBoardRepository.delete(userBoard);
 
@@ -235,14 +231,14 @@ public class BoardService {
         }
     }
 
-    private void validedateLeaveMember(UserBoard userBoard, Long userId) { //회원 자진 탈퇴시 검증메서드
+    private void validedateLeaveMember(UserBoard userBoard, BoardLeaveReq req) { //회원 자진 탈퇴시 검증메서드
         if (userBoard.getBoardAuthority().equals(BoardAuthority.ADMIN)) {
-            if (userId.equals(null)) {
+            if (Objects.equals(req, null)) { // userId.equals(null)시 nullpointexception
                 throw new GlobalException(
                     BoardErrorCode.REQUIRED_NEW_BOARD_ADMIN); //팀장일경우 권한을 넘겨줘야합니다.
             }
 
-            User DelegateeUser = userService.findUser(userId);
+            User DelegateeUser = userService.findUser(req.getUserId());
             UserBoard updateUserBoard = validateMember(DelegateeUser,
                 userBoard.getBoard()); //테스트 해줘야함
             updateUserBoard.UpdateAuthority(BoardAuthority.ADMIN);

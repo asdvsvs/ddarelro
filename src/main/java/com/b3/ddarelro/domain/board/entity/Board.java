@@ -1,5 +1,6 @@
 package com.b3.ddarelro.domain.board.entity;
 
+import com.b3.ddarelro.domain.board.dto.request.BoardUpdateReq;
 import com.b3.ddarelro.domain.common.BaseEntity;
 import com.b3.ddarelro.domain.userboard.entity.UserBoard;
 import jakarta.persistence.Entity;
@@ -22,6 +23,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "tb_board")
 public class Board extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -39,7 +41,7 @@ public class Board extends BaseEntity {
     private List<UserBoard> userBoardList = new ArrayList<>();
 
     @Builder
-    private Board(String name, String description, Color color){
+    private Board(String name, String description, Color color) {
         this.name = name;
         this.description = description;
         this.deleted = false;
@@ -51,8 +53,15 @@ public class Board extends BaseEntity {
         userBoard.setBoard(this);
     }
 
-    public void updateBoardState(Boolean bool){
+    public void updateBoardState(Boolean bool) {
         this.deleted = bool;
+    }
+
+    public void update(BoardUpdateReq req) {
+        this.name = req.getName();
+        this.deleted = false;
+        this.color = req.getColor();
+        this.description = req.getDescription();
     }
 
 }

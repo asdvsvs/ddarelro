@@ -17,7 +17,6 @@ import com.b3.ddarelro.domain.board.dto.response.BoardDeleteRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardDetailRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardDropRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardInviteRes;
-import com.b3.ddarelro.domain.board.dto.response.BoardLeaveRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardPriviewRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardUpdateRes;
 import com.b3.ddarelro.domain.board.entity.Board;
@@ -80,13 +79,13 @@ public class BoardIntegrationTest {
         User user2 = User.builder()
             .username("초대받을사람")
             .email("test1@test.com")
-            .password("123456789")
+            .password("12345678")
             .build();
 
         otherUser = userRepository.save(user2);
 
         User user3 = User.builder()
-            .username("초대받을사람")
+            .username("초대받을사람2")
             .email("test2@test.com")
             .password("123456789")
             .build();
@@ -179,7 +178,7 @@ public class BoardIntegrationTest {
         Board foundBoard = boardRepository.findById(createdBoardId).orElse(null);
         User invitedUser = userRepository.findById(otherUser.getId()).orElse(null);
         BoardInviteReq req = BoardInviteReq.builder()
-            .userId(otherUser.getId())
+            .userId(invitedUser.getId())
             .build();
 
         BoardInviteRes res = boardService.inviteMember(foundUser.getId(), createdBoardId, req);
@@ -189,6 +188,13 @@ public class BoardIntegrationTest {
 
         assertNotNull(userBoard);
         assertEquals(userBoard.getBoardAuthority(), BoardAuthority.MEMBER); //관리자가 아닌 일반멤버임
+
+        //otherUser2를 미리 초대해놓음
+        BoardInviteReq req2 = BoardInviteReq.builder()
+            .userId(otherUser2.getId())
+            .build();
+
+        BoardInviteRes res2 = boardService.inviteMember(foundUser.getId(), createdBoardId, req2);
 
 
     }
@@ -200,17 +206,16 @@ public class BoardIntegrationTest {
 
         User foundUser = userRepository.findById(otherUser.getId()).orElse(null);
         BoardInviteReq req = BoardInviteReq.builder()
-            .userId(otherUser.getId())
+            .userId(otherUser2.getId())
             .build();
-
-        BoardInviteRes res = boardService.inviteMember(foundUser.getId(), createdBoardId, req);
 
         GlobalException exception = assertThrows(GlobalException.class, () -> {
             boardService.inviteMember(foundUser.getId(), createdBoardId, req);
 
         });
 
-        assertEquals(BoardErrorCode.UNAUTHORIZED_ACCESS_BOARD, exception.getMessage()); //팀장권한이없다
+        assertEquals(BoardErrorCode.UNAUTHORIZED_ACCESS_BOARD,
+            exception.getErrorCode()); //팀장권한이없다
     }
 
     @Test
@@ -223,19 +228,38 @@ public class BoardIntegrationTest {
             .userId(otherUser.getId())
             .build();
 
-        BoardInviteRes res = boardService.inviteMember(foundUser.getId(), createdBoardId, req);
-
         GlobalException exception = assertThrows(GlobalException.class, () -> {
             boardService.inviteMember(foundUser.getId(), createdBoardId, req);
         });
 
-        assertEquals(BoardErrorCode.ALREADY_BOARD_MEMBER, exception.getMessage()); //팀장권한이없다
+        assertEquals(BoardErrorCode.ALREADY_BOARD_MEMBER,
+            exception.getErrorCode()); //팀장권한이없다
     }
+
 
     @Test
     @Order(8)
-    @DisplayName("보드 멤버추방")
-    void 보드멤버추방() {
+    @DisplayName("보드 멤버추방 실패 - 팀장이 아닌애가 추방시도")
+    void 보드멤버추방실패1() {
+
+        User foundUser = userRepository.findById(otherUser.getId()).orElse(null);
+
+        BoardDropReq req = BoardDropReq.builder()
+            .userId(otherUser2.getId())
+            .build();
+
+        GlobalException exception = assertThrows(GlobalException.class, () -> {
+            boardService.dropMember(foundUser.getId(), createdBoardId, req);
+        });
+
+        assertEquals(BoardErrorCode.UNAUTHORIZED_ACCESS_BOARD,
+            exception.getErrorCode()); //팀장권한이없다
+    }
+
+    @Test
+    @Order(9)
+    @DisplayName("보드 멤버추방성공")
+    void 보드멤버추방성공() {
 
         User foundUser = userRepository.findById(user.getId()).orElse(null);
         User dropUser = userRepository.findById(otherUser.getId()).orElse(null);
@@ -256,51 +280,18 @@ public class BoardIntegrationTest {
 
 
     @Test
-    @Order(9)
-    @DisplayName("보드 멤버추방 실패 - 팀장이 아닌애가 추방시도")
-    void 보드멤버추방실패1() {
-
-        User foundUser = userRepository.findById(otherUser.getId()).orElse(null);
-        BoardDropReq req = BoardDropReq.builder()
-            .userId(otherUser2.getId())
-            .build();
-
-        BoardDropRes res = boardService.dropMember(foundUser.getId(), createdBoardId, req);
-
-        GlobalException exception = assertThrows(GlobalException.class, () -> {
-            boardService.dropMember(foundUser.getId(), createdBoardId, req);
-        });
-
-        assertEquals(BoardErrorCode.UNAUTHORIZED_ACCESS_BOARD, exception.getMessage()); //팀장권한이없다
-    }
-
-    @Test
-    @Order(9)
-    @DisplayName("보드 탈퇴성공 - 팀장이 아닌경우")
-    void 보드멤버탈퇴() {
-
-        User foundUser = userRepository.findById(otherUser.getId()).orElse(null);
-        BoardLeaveReq req = BoardLeaveReq.builder()
-            .build(); // 팀장이 아니기때문에 위임할 유저id안넘겨준다.
-
-        BoardLeaveRes res = boardService.leaveBoard(foundUser.getId(), createdBoardId, req);
-
-    }
-
-    @Test
     @Order(10)
     @DisplayName("보드 탈퇴실패 - 팀장이지만 위임할 유저를 선택하지 않았을때")
     void 보드멤버탈퇴실패1() {
 
         User foundUser = userRepository.findById(user.getId()).orElse(null);
-        BoardLeaveReq req = BoardLeaveReq.builder()
-            .build(); // 팀장이 탈퇴하지만 권한을 넘겨줄 유저아이디 입력X
-
+        BoardLeaveReq req = null;
         GlobalException exception = assertThrows(GlobalException.class, () -> {
             boardService.leaveBoard(foundUser.getId(), createdBoardId, req);
         });
 
-        assertEquals(BoardErrorCode.REQUIRED_NEW_BOARD_ADMIN, exception.getMessage()); //팀장권한이없다
+        assertEquals(BoardErrorCode.REQUIRED_NEW_BOARD_ADMIN,
+            exception.getErrorCode());
 
     }
 
@@ -312,9 +303,11 @@ public class BoardIntegrationTest {
         User foundUser = userRepository.findById(user.getId()).orElse(null);
         BoardLeaveReq req = BoardLeaveReq.builder()
             .userId(otherUser2.getId())
-            .build(); // 팀장이 탈퇴하지만 권한을 넘겨줄 유저아이디 입력X
+            .build();
 
         Board foundBoard = boardRepository.findById(createdBoardId).orElse(null);
+
+        boardService.leaveBoard(foundUser.getId(), createdBoardId, req);
 
         UserBoard userBoard = userBoardRepository.findByUserAndBoard(foundUser, foundBoard)
             .orElse(null);
@@ -360,9 +353,10 @@ public class BoardIntegrationTest {
 
     @AfterAll
     void deleteAll() {
+        userBoardRepository.deleteAll();
         userRepository.deleteAll();
         boardRepository.deleteAll();
-        userBoardRepository.deleteAll();
+
         //transactional이 안걸려있는 같은 인스턴스를 공유하는 테스트클래스라서 repo를 수동으로 비워줘야한다.
     }
 
