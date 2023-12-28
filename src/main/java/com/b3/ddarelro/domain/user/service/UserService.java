@@ -51,6 +51,7 @@ public class UserService {
         User foundUser = findUser(userId);
 
         return UserRes.builder()
+            .id(foundUser.getId())
             .email(foundUser.getEmail())
             .Username(foundUser.getUsername())
             .build();
