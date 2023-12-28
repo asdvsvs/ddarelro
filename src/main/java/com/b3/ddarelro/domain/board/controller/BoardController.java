@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -88,9 +89,14 @@ public class BoardController {
 
 
     @GetMapping
-    public ResponseEntity<List<BoardPriviewRes>> getBoardListAll(){ //보드 목록 조회
+    public ResponseEntity<List<BoardPriviewRes>> getBoardListAll(
+        @RequestParam(value = "sortBy", defaultValue = "createdAt") String sortBy,
+        @RequestParam(value = "isAsc",defaultValue = "false") boolean isAsc
+    )
+
+    { //보드 목록 조회
         return ResponseEntity.status(HttpStatus.OK)
-            .body(boardService.getBoardList());
+            .body(boardService.getBoardList(isAsc,sortBy));
     }
 
     @GetMapping("/boardId")

@@ -26,6 +26,7 @@ import com.b3.ddarelro.domain.userboard.repository.UserBoardRepository;
 import com.b3.ddarelro.global.exception.GlobalException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -108,9 +109,12 @@ public class BoardService {
     }
 
     @Transactional(readOnly = true)
-    public List<BoardPriviewRes> getBoardList() {
+    public List<BoardPriviewRes> getBoardList(boolean isAsc,String sortBy) {
 
-        List<Board> boardList =  boardRepository.findAll();
+        Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort sort = Sort.by(direction, sortBy);
+
+        List<Board> boardList =  boardRepository.findAll(sort);
 
         return boardList.stream()
             .filter(board -> board.getDeleted().equals(false))
