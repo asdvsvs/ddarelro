@@ -91,7 +91,7 @@ public class BoardService {
         validteUserAuthority(founddUser,foundBoard);
 
         foundBoard.updateBoardState(true);
-        //columnService.deleteAllColumn(boardId);
+        columnService.deleteAllColumn(boardId);
         return new BoardDeleteRes("삭제가 완료되었습니다.");
     }
 
