@@ -186,7 +186,7 @@ public class BoardService {
 
         UserBoard userBoard = validateMember(founddUser, foundBoard);
 
-        validedateLeaveMember(userBoard, req.getUserId());
+        validedateLeaveMember(userBoard, req);
 
         userBoardRepository.delete(userBoard);
 
@@ -231,14 +231,14 @@ public class BoardService {
         }
     }
 
-    private void validedateLeaveMember(UserBoard userBoard, Long userId) { //회원 자진 탈퇴시 검증메서드
+    private void validedateLeaveMember(UserBoard userBoard, BoardLeaveReq req) { //회원 자진 탈퇴시 검증메서드
         if (userBoard.getBoardAuthority().equals(BoardAuthority.ADMIN)) {
-            if (Objects.equals(userId, null)) { // userId.equals(null)시 nullpointexception
+            if (Objects.equals(req, null)) { // userId.equals(null)시 nullpointexception
                 throw new GlobalException(
                     BoardErrorCode.REQUIRED_NEW_BOARD_ADMIN); //팀장일경우 권한을 넘겨줘야합니다.
             }
 
-            User DelegateeUser = userService.findUser(userId);
+            User DelegateeUser = userService.findUser(req.getUserId());
             UserBoard updateUserBoard = validateMember(DelegateeUser,
                 userBoard.getBoard()); //테스트 해줘야함
             updateUserBoard.UpdateAuthority(BoardAuthority.ADMIN);
