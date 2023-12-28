@@ -25,3 +25,16 @@ spring:
   jwt:
     secret:
       key: ${JWT_SECRET_KEY}
+
+cloud:
+  aws:
+    s3:
+      bucket: ddarelro
+    credentials:
+      access-key: AKIAVNRLFCIUCT6TY2UE
+      secret-key: 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
+    region:
+      static: ap-northeast-2
+      auto: false
+    stack:
+      auto: false
