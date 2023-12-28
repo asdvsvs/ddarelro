@@ -1,7 +1,9 @@
 package com.b3.ddarelro.domain.user.controller;
 
+import com.b3.ddarelro.domain.user.dto.request.UserPasswordUpdateReq;
 import com.b3.ddarelro.domain.user.dto.request.UserSignupReq;
 import com.b3.ddarelro.domain.user.dto.request.UsernameUpdateReq;
+import com.b3.ddarelro.domain.user.dto.response.UserPasswordUpdateRes;
 import com.b3.ddarelro.domain.user.dto.response.UserRes;
 import com.b3.ddarelro.domain.user.dto.response.UsernameUpdateRes;
 import com.b3.ddarelro.domain.user.service.UserService;
@@ -46,6 +48,15 @@ public class UserController {
         UsernameUpdateRes resDto =
             userService.updateUsername(userDetails.getUser().getId(), reqDto);
 
+        return ResponseEntity.ok(resDto);
+    }
+
+    @PatchMapping("/password")
+    public ResponseEntity<UserPasswordUpdateRes> updatePassword(
+        @Valid @RequestBody UserPasswordUpdateReq reqDto,
+        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        UserPasswordUpdateRes resDto =
+            userService.updatePassword(userDetails.getUser().getId(), reqDto);
         return ResponseEntity.ok(resDto);
     }
 }
