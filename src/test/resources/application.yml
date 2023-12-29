@@ -22,3 +22,16 @@ spring:
 jwt:
   secret:
     key: testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest
+
+cloud:
+  aws:
+    s3:
+      bucket: testest
+    credentials:
+      access-key: testest
+      secret-key: testest
+    region:
+      static: ap-northeast-2
+      auto: false
+    stack:
+      auto: false
