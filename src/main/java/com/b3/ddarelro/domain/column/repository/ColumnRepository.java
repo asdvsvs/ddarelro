@@ -18,8 +18,7 @@ public interface ColumnRepository extends JpaRepository<Column, Long> {
     List<Long> findAllByBoardIdAndDeleted(Long boardId);
 
     @Query("select count(*) from Column c "
-        + "join c.board b "
-        + "where b.id = :boardId")
+        + "where c.board.id = :boardId")
     Long countByBoardId(Long boardId);
 
     @Modifying
@@ -33,4 +32,9 @@ public interface ColumnRepository extends JpaRepository<Column, Long> {
         + "set c.deleted=false "
         + "where c.id in (:columnIdList)")
     void softRestore(List<Long> columnIdList);
+
+    @Modifying
+    @Query("update Column c set c.priority = c.priority + :moveDirection "
+        + "where c.priority between :start and :end")
+    void moveAnotherColumns(Long start, Long end, Long moveDirection);
 }
