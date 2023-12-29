@@ -25,3 +25,9 @@ spring:
   jwt:
     secret:
       key: ${JWT_SECRET_KEY}
+
+server:
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
