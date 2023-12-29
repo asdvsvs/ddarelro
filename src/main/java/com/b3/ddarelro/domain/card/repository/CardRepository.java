@@ -19,4 +19,8 @@ public interface CardRepository extends JpaRepository<Card, Long> {
     @Modifying
     @Query(value = "update Card c set c.deleted = false where c.column.id in (:columnIds)")
     void restoreAll(List<Long> columnIds);
+
+    @Modifying
+    @Query("update Card c set c.priority = c.priority + :moveDirection where c.priority between :start and :end")
+    void moveAnotherCards(Long start, Long end, Long moveDirection);
 }

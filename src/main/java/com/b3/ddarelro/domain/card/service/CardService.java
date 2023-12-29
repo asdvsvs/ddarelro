@@ -40,7 +40,6 @@ public class CardService {
 
         Card newCard = Card.builder()
             .name(req.name())
-            .user(user)
             .column(column)
             .description(req.description())
             .color(req.color())
@@ -95,6 +94,57 @@ public class CardService {
     }
 
     @Transactional
+    public CardMoveRes moveCard(Long cardId, CardMoveReq req, User user) {
+        userService.findUser(user.getId());
+        Column column = columnService.findColumn(req.columnId());
+
+        Card card = findCard(cardId);
+        if (req.anotherColumnId() != null) {
+            //현재컬럼내 카드들 마지막 순위로
+            Long spotInSameColumn = cardRepository.countByColumnId(column.getId());
+            card.moveSpot(spotInSameColumn);
+            //나머지 카드들 순위순 정리
+            orderByPriorityOtherCards(card, spotInSameColumn);
+            //다른 컬럼으로 카드 이동
+            Column anotherColumn = columnService.findColumn(req.anotherColumnId());
+            card.changeColumn(anotherColumn);
+            //이동한 다른 컬럼내 위치 이동
+            movePosition(req.spot(), card, anotherColumn.getId());
+
+            return CardMoveRes.formWith(card);
+        }
+        movePosition(req.spot(), card, column.getId());
+
+        return CardMoveRes.formWith(card);
+    }
+
+    private void movePosition(Long spot, Card card, Long columnId) {
+        spot = defineSpot(spot, columnId);
+        if (Objects.equals(card.getPriority(), spot)) {
+            throw new GlobalException(CardErrorCode.CANNOT_BE_SAME_PRIORITY);
+        }
+        orderByPriorityOtherCards(card, spot);
+        card.moveSpot(spot);
+    }
+
+    private void orderByPriorityOtherCards(Card card, Long spotInSameColumn) {
+        Long moveDirection = card.getPriority() > spotInSameColumn ? 1L : -1L;
+        Long start = moveDirection == -1L ? card.getPriority() : spotInSameColumn;
+        Long end = moveDirection == -1L ? spotInSameColumn : card.getPriority();
+        cardRepository.moveAnotherCards(start, end, moveDirection);
+    }
+
+    private Long defineSpot(Long spot, Long columnId) {
+        Long cardCnt = cardRepository.countByColumnId(columnId);
+        if (spot < 1) {
+            spot = 1L;
+        } else if (spot > cardCnt) {
+            spot = cardCnt;
+        }
+        return spot;
+    }
+
+    @Transactional
     public CardDeleteRes deleteCard(Long cardId, CardDeleteReq req, User user) {
         userService.findUser(user.getId());
         Column column = columnService.findColumn(req.columnId());
@@ -129,22 +179,15 @@ public class CardService {
     }
 
     private List<Long> findCardIdsByColumn(Long cardId, User user, Column column) {
-        Card card = getUserCard(cardId, user);
+        Card card = findCard(cardId);
         card.deleteRestoreCard();
         List<Card> cardList = cardRepository.findAllByColumnIdAndNotDeleted(column.getId());
         return cardList.stream().map(Card::getId).toList();
-    }
-
-    private Card getUserCard(Long cardId, User user) {
-        Card card = findCard(cardId);
-        if (!card.getUser().getId().equals(user.getId())) {
-            throw new GlobalException(CardErrorCode.INVALID_USER_CARD);
-        }
-        return card;
     }
 
     public Card findCard(Long cardId) {
         return cardRepository.findById(cardId)
             .orElseThrow(() -> new GlobalException(CardErrorCode.NOT_FOUND));
     }
+
 }

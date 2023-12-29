@@ -8,8 +8,8 @@ import org.springframework.http.*;
 @RequiredArgsConstructor
 public enum CardErrorCode implements ErrorCode {
 
-    NOT_FOUND(HttpStatus.NOT_FOUND, "카드가 존재하지 않아요!"),
-    INVALID_USER_CARD(HttpStatus.FORBIDDEN, "본인의 카드만 수정 및 삭제가 가능해요!");
+    CANNOT_BE_SAME_PRIORITY(HttpStatus.FORBIDDEN, "같은 자리로는 이동 할 수 없어요!"),
+    NOT_FOUND(HttpStatus.NOT_FOUND, "카드가 존재하지 않아요!");
 
     private final HttpStatus httpStatus;
     private final String message;
