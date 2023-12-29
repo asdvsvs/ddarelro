@@ -3,6 +3,7 @@ package com.b3.ddarelro.domain.user.controller;
 import com.b3.ddarelro.domain.user.dto.request.UserPasswordUpdateReq;
 import com.b3.ddarelro.domain.user.dto.request.UserSignupReq;
 import com.b3.ddarelro.domain.user.dto.request.UsernameUpdateReq;
+import com.b3.ddarelro.domain.user.dto.response.UserDeleteRes;
 import com.b3.ddarelro.domain.user.dto.response.UserPasswordUpdateRes;
 import com.b3.ddarelro.domain.user.dto.response.UserRes;
 import com.b3.ddarelro.domain.user.dto.response.UsernameUpdateRes;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,14 +32,15 @@ public class UserController {
 
     @PostMapping("/signup")
     public ResponseEntity<UserSignupReq> signup(@Valid @RequestBody UserSignupReq reqDto) {
+
         userService.signup(reqDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/{userId}")
     public ResponseEntity<UserRes> getUser(@PathVariable Long userId) {
-        UserRes resDto = userService.getUser(userId);
 
+        UserRes resDto = userService.getUser(userId);
         return ResponseEntity.ok(resDto);
     }
 
@@ -45,9 +48,9 @@ public class UserController {
     public ResponseEntity<UsernameUpdateRes> updateUsername(
         @Valid @RequestBody UsernameUpdateReq reqDto,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
         UsernameUpdateRes resDto =
             userService.updateUsername(userDetails.getUser().getId(), reqDto);
-
         return ResponseEntity.ok(resDto);
     }
 
@@ -55,8 +58,17 @@ public class UserController {
     public ResponseEntity<UserPasswordUpdateRes> updatePassword(
         @Valid @RequestBody UserPasswordUpdateReq reqDto,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
         UserPasswordUpdateRes resDto =
             userService.updatePassword(userDetails.getUser().getId(), reqDto);
+        return ResponseEntity.ok(resDto);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<UserDeleteRes> deleteUser(
+        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        UserDeleteRes resDto = userService.deleteUser(userDetails.getUser().getId());
         return ResponseEntity.ok(resDto);
     }
 }

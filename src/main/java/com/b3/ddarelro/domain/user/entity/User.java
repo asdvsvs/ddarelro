@@ -32,14 +32,14 @@ public class User extends BaseEntity {
     private String password;
 
     @Column(nullable = false)
-    private Boolean Deleted;
+    private Boolean deleted;
 
     @Builder
     private User(String email, String username, String password) {
         this.email = email;
         this.username = username;
         this.password = password;
-        this.Deleted = false;
+        this.deleted = false;
     }
 
     public void updateUsername(String username) {
@@ -48,5 +48,9 @@ public class User extends BaseEntity {
 
     public void updatePassword(String password) {
         this.password = password;
+    }
+
+    public void delete() {
+        this.deleted = true;
     }
 }
