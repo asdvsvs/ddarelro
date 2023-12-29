@@ -6,6 +6,7 @@ import lombok.*;
 
 @Builder
 public record CardCreateRes(
+    Long id,
     String name,
     String username,
     String description,
@@ -19,6 +20,7 @@ public record CardCreateRes(
 
     public static CardCreateRes formingWith(Card card, Long priority) {
         return CardCreateRes.builder()
+            .id(card.getId())
             .name(card.getName())
             .username(card.getUser().getUsername())
             .description(card.getDescription())

@@ -18,7 +18,6 @@ public record CardListRes(
         return CardListRes.builder()
             .id(card.getId())
             .name(card.getName())
-            //.username(card.getUser().getUsername())
             .description(card.getDescription())
             .color(card.getColor())
             .createdAt(card.getCreatedAt())

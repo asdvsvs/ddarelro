@@ -6,6 +6,7 @@ import lombok.*;
 
 @Builder
 public record CardModifyRes(
+    Long id,
     String name,
     String username,
     String description,
@@ -19,6 +20,7 @@ public record CardModifyRes(
 
     public static CardModifyRes formWith(Card card) {
         return CardModifyRes.builder()
+            .id(card.getId())
             .name(card.getName())
             .username(card.getUser().getUsername())
             .description(card.getDescription())
