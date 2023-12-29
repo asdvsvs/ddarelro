@@ -1,6 +1,7 @@
 package com.b3.ddarelro.domain.column.entity;
 
 import com.b3.ddarelro.domain.board.entity.Board;
+import com.b3.ddarelro.domain.card.entity.Card;
 import com.b3.ddarelro.domain.common.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -9,7 +10,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,6 +38,9 @@ public class Column extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "boardId")
     private Board board;
+
+    @OneToMany(mappedBy = "column")
+    private List<Card> cards = new ArrayList<>();
 
     @Builder
     public Column(String title, Long priority, Boolean deleted, Board board) {
