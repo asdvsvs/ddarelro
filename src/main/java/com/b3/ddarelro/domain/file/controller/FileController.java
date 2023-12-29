@@ -1,5 +1,7 @@
 package com.b3.ddarelro.domain.file.controller;
 
+import com.b3.ddarelro.domain.file.dto.FileListReq;
+import com.b3.ddarelro.domain.file.dto.request.FileUploadReq;
 import com.b3.ddarelro.domain.file.dto.response.FileDeleteRes;
 import com.b3.ddarelro.domain.file.dto.response.FileDownloadRes;
 import com.b3.ddarelro.domain.file.dto.response.FileListRes;
@@ -17,38 +19,39 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/api/cards")
+@RequestMapping("/api/files")
 @RequiredArgsConstructor
 public class FileController {
 
     private final FileService fileService;
 
-    @PostMapping("/{cardId}/files")
+    @PostMapping
     public ResponseEntity<List<FileUploadRes>> uploadFile(
-        @PathVariable Long cardId,
-        @RequestParam("file") List<MultipartFile> multipartFileList
+        @RequestPart("file") List<MultipartFile> multipartFileList,
+        @RequestPart("dto") FileUploadReq req
     ) throws IOException {
 
-        List<FileUploadRes> res = fileService.uploadFile(cardId, multipartFileList);
+        List<FileUploadRes> res = fileService.uploadFile(req.cardId(), multipartFileList);
         return ResponseEntity.status(HttpStatus.CREATED).body(res);
     }
 
-    @GetMapping("/{cardId}/files")
+    @GetMapping
     public ResponseEntity<List<FileListRes>> getFileList(
-        @PathVariable Long cardId
+        @RequestBody FileListReq req
     ) {
 
-        List<FileListRes> res = fileService.getFileList(cardId);
+        List<FileListRes> res = fileService.getFileList(req.cardId());
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 
-    @GetMapping("/files/{fileId}")
+    @GetMapping("/{fileId}")
     public ResponseEntity<UrlResource> downloadFile(
         @PathVariable Long fileId
     ) throws MalformedURLException {
@@ -59,7 +62,7 @@ public class FileController {
     }
 
 
-    @DeleteMapping("/files/{fileId}")
+    @DeleteMapping("/{fileId}")
     public ResponseEntity<FileDeleteRes> deleteFile(
         @PathVariable Long fileId
     ) {
