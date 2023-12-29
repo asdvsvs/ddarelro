@@ -17,14 +17,20 @@ spring:
         format_sql: true
       dialect: org.hibernate.dialect.MySQL8InnoDBDialect
     defer-datasource-initialization: true
-    sql:
-      init:
-        mode: always
-        encoding: UTF-8
 
-  jwt:
-    secret:
-      key: ${JWT_SECRET_KEY}
+  sql:
+    init:
+      mode: always
+      encoding: UTF-8
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+jwt:
+  secret:
+    key: ${JWT_SECRET_KEY}
 
 cloud:
   aws:
