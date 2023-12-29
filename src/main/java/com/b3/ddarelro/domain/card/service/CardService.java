@@ -5,9 +5,11 @@ import com.b3.ddarelro.domain.card.dto.response.*;
 import com.b3.ddarelro.domain.card.entity.*;
 import com.b3.ddarelro.domain.card.exception.*;
 import com.b3.ddarelro.domain.card.repository.*;
+import com.b3.ddarelro.domain.checklist.service.*;
 import com.b3.ddarelro.domain.column.entity.*;
 import com.b3.ddarelro.domain.column.service.*;
 import com.b3.ddarelro.domain.comment.service.*;
+import com.b3.ddarelro.domain.file.service.*;
 import com.b3.ddarelro.domain.user.entity.*;
 import com.b3.ddarelro.domain.user.service.*;
 import com.b3.ddarelro.global.exception.*;
@@ -26,12 +28,13 @@ public class CardService {
     private final ColumnService columnService;
     private final UserService userService;
     private final CommentDeleteRestoreService commentDeleteRestoreService;
+    private final FileDeleteRestoreService fileDeleteRestoreService;
+    private final CheckListDeleteRestoreService checkListDeleteRestoreService;
 
     @Transactional
     public CardCreateRes createCard(CardCreateReq req, User user) {
         userService.findUser(user.getId());
-        Long columnId = req.columnId();
-        Column column = columnService.findColumn(columnId);
+        Column column = columnService.findColumn(req.columnId());
 
         Long priority = cardRepository.countByColumnId(req.columnId()) + 1;
 
@@ -53,15 +56,14 @@ public class CardService {
 
         List<Card> cardList = cardRepository.findAllByColumnIdAndNotDeleted(column.getId());
 
-        return cardList.stream().map(card -> CardListRes.formWith(card))
+        return cardList.stream().map(CardListRes::formWith)
             .collect(Collectors.toList());
     }
 
     @Transactional
     public CardRes getCard(Long cardId, CardReq req, User user) {
         userService.findUser(user.getId());
-        Long columnId = req.columnId();
-        columnService.findColumn(columnId);
+        columnService.findColumn(req.columnId());
 
         Card card = findCard(cardId);
 
@@ -71,8 +73,7 @@ public class CardService {
     @Transactional
     public CardModifyRes modifyCard(Long cardId, CardModifyReq req, User user) {
         userService.findUser(user.getId());
-        Long columnId = req.columnId();
-        columnService.findColumn(columnId);
+        columnService.findColumn(req.columnId());
 
         Card card = findCard(cardId);
 
@@ -83,8 +84,7 @@ public class CardService {
     @Transactional
     public CardDueDateRes setDueDateCard(Long cardId, CardDueDateReq req, User user) {
         userService.findUser(user.getId());
-        Long columnId = req.columnId();
-        columnService.findColumn(columnId);
+        columnService.findColumn(req.columnId());
 
         Card card = findCard(cardId);
 
@@ -101,6 +101,8 @@ public class CardService {
 
         List<Long> cardIdList = findCardIdsByColumn(cardId, user, column);
         commentDeleteRestoreService.deleteAllComment(cardIdList);
+        fileDeleteRestoreService.deleteAllFiles(cardIdList);
+        checkListDeleteRestoreService.deleteAllComment(cardIdList);
         return CardDeleteRes.builder().msg("카드가 삭제 됬어요!").build();
     }
 
@@ -111,6 +113,8 @@ public class CardService {
 
         List<Long> cardIdList = findCardIdsByColumn(cardId, user, column);
         commentDeleteRestoreService.restoreAllComment(cardIdList);
+        fileDeleteRestoreService.restoreAllFiles(cardIdList);
+        checkListDeleteRestoreService.restoreAllComment(cardIdList);
         return CardRestoreRes.builder().msg("카드가 복구 됬어요!").build();
     }
 
@@ -127,8 +131,7 @@ public class CardService {
         Card card = getUserCard(cardId, user);
         card.deleteRestoreCard();
         List<Card> cardList = cardRepository.findAllByColumnIdAndNotDeleted(column.getId());
-        List<Long> cardIdList = cardList.stream().map(Card::getId).toList();
-        return cardIdList;
+        return cardList.stream().map(Card::getId).toList();
     }
 
     private Card getUserCard(Long cardId, User user) {
