@@ -18,6 +18,7 @@ import com.b3.ddarelro.domain.board.dto.response.BoardDetailRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardDropRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardInviteRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardPriviewRes;
+import com.b3.ddarelro.domain.board.dto.response.BoardRestoreRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardUpdateRes;
 import com.b3.ddarelro.domain.board.entity.Board;
 import com.b3.ddarelro.domain.board.entity.Color;
@@ -49,6 +50,7 @@ public class BoardIntegrationTest {
 
     @Autowired
     private BoardRepository boardRepository;
+
 
     @Autowired
     private UserBoardRepository userBoardRepository;
@@ -327,7 +329,6 @@ public class BoardIntegrationTest {
     void 보드삭제() {
 
         User foundUser = userRepository.findById(otherUser2.getId()).orElse(null);
-        Board foundBoard = boardRepository.findById(createdBoardId).orElse(null);
 
         BoardDeleteRes res = boardService.deleteBoard(createdBoardId, foundUser.getId());
 
@@ -347,6 +348,21 @@ public class BoardIntegrationTest {
         List<BoardPriviewRes> boardList = boardService.getBoardList(true, "createdAt");
 
         assertTrue(boardList.isEmpty());
+
+    }
+
+    @Test
+    @Order(14)
+    @DisplayName("보드복구")
+    void 삭제된보드복구() {
+
+        User foundUser = userRepository.findById(otherUser2.getId()).orElse(null);
+
+        BoardRestoreRes res = boardService.restoreBoard(foundUser.getId(), createdBoardId);
+
+        Board deletedBoard = boardRepository.findById(createdBoardId).orElse(null);
+
+        assertEquals(deletedBoard.getDeleted(), false);
 
     }
 
