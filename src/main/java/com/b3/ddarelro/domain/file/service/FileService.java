@@ -118,8 +118,8 @@ public class FileService {
     public FileDeleteRes deleteFile(Long fileId) {
         File file = findFile(fileId);
 
-        file.updateState(true);
-
+        fileRepository.delete(file);
+        amazonS3.deleteObject(bucket, "cards/" + file.getStoreFilename());
         return FileDeleteRes.builder()
             .message("파일삭제가 완료되었습니다.")
             .build();
