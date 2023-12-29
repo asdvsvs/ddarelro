@@ -10,9 +10,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -26,7 +26,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
-    // private final RedisUtil redisUtil;
     private final UserDetailsServiceImpl userDetailsService;
 
     @Override
@@ -38,21 +37,12 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         //TODO: AccessToken 만료시 RefreshToken을 사용하여 AccessToken 재발급
 
         if (StringUtils.hasText(accessToken)) {
-
             if (!jwtUtil.validateToken(accessToken)) {
                 log.error("Token Error");
-
                 // 토큰이 유효하지 않음을 JSON 형식으로 응답 메시지, 상태코드 생성
-                ObjectMapper ob = new ObjectMapper();
-                ErrorResponse errorResponse = ErrorResponse.builder()
-                    .status(SecurityErrorCode.INVALID_TOKEN.getHttpStatus().value())
-                    .build();
-                errorResponse.addMessage(SecurityErrorCode.INVALID_TOKEN.getMessage());
-
-                response.setStatus(errorResponse.getStatus());
-                String jsonResponse = ob.writeValueAsString(errorResponse);
-                PrintWriter writer = response.getWriter();
-                writer.println(jsonResponse);
+                sendErrorResponse(response,
+                    SecurityErrorCode.INVALID_TOKEN.getHttpStatus().value(),
+                    SecurityErrorCode.INVALID_TOKEN.getMessage());
                 return;
             }
 
@@ -61,24 +51,44 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             try {
                 setAuthentication(info.getSubject());
             } catch (Exception e) {
-                log.error(e.getMessage());
+                log.error("Authentication error: {}", e.getMessage());
                 return;
             }
         }
         filterChain.doFilter(request, response);
     }
 
+    // 인증 처리
     public void setAuthentication(String email) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
+
         Authentication authentication = createAuthentication(email);
         context.setAuthentication(authentication);
 
         SecurityContextHolder.setContext(context);
     }
 
+    // 인증객체 생성
     private Authentication createAuthentication(String email) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
         return new UsernamePasswordAuthenticationToken(userDetails, null,
             userDetails.getAuthorities());
+    }
+
+    // 응답 메세지 생성
+    private void sendErrorResponse(HttpServletResponse response, int status, String message)
+        throws IOException {
+        ErrorResponse errorResponse = ErrorResponse.builder()
+            .status(status)
+            .build();
+        errorResponse.addMessage(message);
+
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setStatus(errorResponse.getStatus());
+        try {
+            response.getWriter().println(new ObjectMapper().writeValueAsString(errorResponse));
+        } catch (IOException e) {
+            log.error("Response writing failed: {}", e.getMessage());
+        }
     }
 }

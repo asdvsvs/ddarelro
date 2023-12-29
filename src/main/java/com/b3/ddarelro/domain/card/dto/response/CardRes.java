@@ -20,6 +20,7 @@ public record CardRes(
 
     public static CardRes formWith(Card card) {
         return CardRes.builder()
+            .id(card.getId())
             .name(card.getName())
             .username(card.getUser().getUsername())
             .description(card.getDescription())

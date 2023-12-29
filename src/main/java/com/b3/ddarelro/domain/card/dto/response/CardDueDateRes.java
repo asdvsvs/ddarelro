@@ -6,6 +6,7 @@ import lombok.*;
 
 @Builder
 public record CardDueDateRes(
+    Long id,
     String name,
     String username,
     String description,
@@ -19,6 +20,7 @@ public record CardDueDateRes(
 
     public static CardDueDateRes formWith(Card card, LocalDate dueDate) {
         return CardDueDateRes.builder()
+            .id(card.getId())
             .name(card.getName())
             .username(card.getUser().getUsername())
             .description(card.getDescription())
