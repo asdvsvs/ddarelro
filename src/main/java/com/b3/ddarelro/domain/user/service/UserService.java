@@ -100,9 +100,12 @@ public class UserService {
     }
 
     public User findUser(final Long id) {
-        return userRepository.findById(id)
+        User user = userRepository.findById(id)
             .orElseThrow(() -> new GlobalException(UserErrorCode.NOT_FOUND_USER));
-
+        if (user.getDeleted()) {
+            throw new GlobalException(UserErrorCode.DELETED_USER);
+        }
+        return user;
     }
 
     private void validateDeleteUser(User user) {
