@@ -58,7 +58,7 @@ public class Card extends BaseEntity {
         this.color = reqDto.color();
     }
 
-    public void deleteCard() {
+    public void deleteRestoreCard() {
         this.deleted = !this.deleted;
     }
 
