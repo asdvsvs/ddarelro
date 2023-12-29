@@ -108,9 +108,9 @@ public class CardService {
     }
 
     private static LocalDate getDueDate(CardDueDateReq req) {
-        int year = req.dueDateY();
-        int month = req.dueDateM();
-        int day = req.dueDateD();
+        int year = req.year();
+        int month = req.month();
+        int day = req.day();
         LocalDate dueDate;
         dueDate = LocalDate.of(year, month, day);
         return dueDate;
