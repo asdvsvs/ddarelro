@@ -99,12 +99,19 @@ public class CardService {
         userService.findUser(user.getId());
         Column column = columnService.findColumn(req.columnId());
 
-        Card card = getUserCard(cardId, user);
-        card.deleteCard();
-        List<Card> cardList = cardRepository.findAllByColumnIdAndNotDeleted(column.getId());
-        List<Long> cardIdList = cardList.stream().map(Card::getId).toList();
+        List<Long> cardIdList = findCardIdsByColumn(cardId, user, column);
         commentDeleteRestoreService.deleteAllComment(cardIdList);
         return CardDeleteRes.builder().msg("카드가 삭제 됬어요!").build();
+    }
+
+    @Transactional
+    public CardRestoreRes restoreCard(Long cardId, CardRestoreReq req, User user) {
+        userService.findUser(user.getId());
+        Column column = columnService.findColumn(req.columnId());
+
+        List<Long> cardIdList = findCardIdsByColumn(cardId, user, column);
+        commentDeleteRestoreService.restoreAllComment(cardIdList);
+        return CardRestoreRes.builder().msg("카드가 복구 됬어요!").build();
     }
 
     private static LocalDate getDueDate(CardDueDateReq req) {
@@ -116,10 +123,18 @@ public class CardService {
         return dueDate;
     }
 
+    private List<Long> findCardIdsByColumn(Long cardId, User user, Column column) {
+        Card card = getUserCard(cardId, user);
+        card.deleteRestoreCard();
+        List<Card> cardList = cardRepository.findAllByColumnIdAndNotDeleted(column.getId());
+        List<Long> cardIdList = cardList.stream().map(Card::getId).toList();
+        return cardIdList;
+    }
+
     private Card getUserCard(Long cardId, User user) {
         Card card = findCard(cardId);
         if (!card.getUser().getId().equals(user.getId())) {
-            throw new GlobalException(CardErrorCode.INVALID_USER);
+            throw new GlobalException(CardErrorCode.INVALID_USER_CARD);
         }
         return card;
     }
