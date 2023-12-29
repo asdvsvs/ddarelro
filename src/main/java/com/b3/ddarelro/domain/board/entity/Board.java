@@ -1,6 +1,7 @@
 package com.b3.ddarelro.domain.board.entity;
 
 import com.b3.ddarelro.domain.board.dto.request.BoardUpdateReq;
+import com.b3.ddarelro.domain.column.entity.Column;
 import com.b3.ddarelro.domain.common.BaseEntity;
 import com.b3.ddarelro.domain.userboard.entity.UserBoard;
 import jakarta.persistence.Entity;
@@ -39,6 +40,10 @@ public class Board extends BaseEntity {
 
     @OneToMany(mappedBy = "board")
     private List<UserBoard> userBoardList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "board")
+    private List<Column> columnList = new ArrayList<>();
+
 
     @Builder
     private Board(String name, String description, Color color) {

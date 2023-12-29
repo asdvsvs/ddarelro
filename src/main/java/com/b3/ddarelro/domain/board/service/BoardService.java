@@ -17,6 +17,7 @@ import com.b3.ddarelro.domain.board.dto.response.BoardUpdateRes;
 import com.b3.ddarelro.domain.board.entity.Board;
 import com.b3.ddarelro.domain.board.exception.BoardErrorCode;
 import com.b3.ddarelro.domain.board.repository.BoardRepository;
+import com.b3.ddarelro.domain.column.service.ColumnDeleteRestoreService;
 import com.b3.ddarelro.domain.user.entity.User;
 import com.b3.ddarelro.domain.user.service.UserService;
 import com.b3.ddarelro.domain.userboard.entity.BoardAuthority;
@@ -38,7 +39,7 @@ public class BoardService {
     private final BoardRepository boardRepository;
     private final UserBoardRepository userBoardRepository;
     private final UserService userService;
-    //private final ColumnService columnService;
+    private final ColumnDeleteRestoreService columnDeleteRestoreService;
 
     public BoardCreateRes createBoard(Long userId, BoardCreateReq reqDto) {
 
@@ -86,7 +87,7 @@ public class BoardService {
         validteUserAuthority(founddUser, foundBoard);
 
         foundBoard.updateBoardState(true);
-        //columnService.deleteAllColumn(boardId);
+        columnDeleteRestoreService.deleteAllColumn(boardId);
         return new BoardDeleteRes("삭제가 완료되었습니다.");
     }
 
@@ -96,6 +97,7 @@ public class BoardService {
         Board foundBoard = findBoard(boardId);
 
         foundBoard.updateBoardState(false);
+        columnDeleteRestoreService.restoreAllColumn(boardId);
 
         return new BoardRestoreRes(foundBoard);
 
@@ -233,7 +235,7 @@ public class BoardService {
 
     private void validedateLeaveMember(UserBoard userBoard, BoardLeaveReq req) { //회원 자진 탈퇴시 검증메서드
         if (userBoard.getBoardAuthority().equals(BoardAuthority.ADMIN)) {
-            if (Objects.equals(req, null)) { // userId.equals(null)시 nullpointexception
+            if (Objects.equals(req, null) || req.getUserId() == null) {
                 throw new GlobalException(
                     BoardErrorCode.REQUIRED_NEW_BOARD_ADMIN); //팀장일경우 권한을 넘겨줘야합니다.
             }

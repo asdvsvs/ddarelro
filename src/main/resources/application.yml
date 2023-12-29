@@ -26,6 +26,19 @@ spring:
     secret:
       key: ${JWT_SECRET_KEY}
 
+cloud:
+  aws:
+    s3:
+      bucket: ${BUCKET_NAME}
+    credentials:
+      access-key: ${S3_ACCESS_KEY}
+      secret-key: ${S3_SECRET_KEY}
+    region:
+      static: ap-northeast-2
+      auto: false
+    stack:
+      auto: false
+
 server:
   servlet:
     encoding:
