@@ -29,10 +29,10 @@ spring:
 cloud:
   aws:
     s3:
-      bucket: ddarelro
+      bucket: ${BUCKET_NAME}
     credentials:
-      access-key: AKIAVNRLFCIUCT6TY2UE
-      secret-key: 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
+      access-key: ${S3_ACCESS_KEY}
+      secret-key: ${S3_SECRET_KEY}
     region:
       static: ap-northeast-2
       auto: false
