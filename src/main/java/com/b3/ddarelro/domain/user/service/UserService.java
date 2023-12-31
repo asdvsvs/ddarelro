@@ -9,6 +9,7 @@ import com.b3.ddarelro.domain.user.dto.response.UserPasswordUpdateRes;
 import com.b3.ddarelro.domain.user.dto.response.UserRes;
 import com.b3.ddarelro.domain.user.dto.response.UsernameUpdateRes;
 import com.b3.ddarelro.domain.user.entity.User;
+import com.b3.ddarelro.domain.user.entity.UserStatus;
 import com.b3.ddarelro.domain.user.exception.EmailErrorCode;
 import com.b3.ddarelro.domain.user.exception.UserErrorCode;
 import com.b3.ddarelro.domain.user.repository.UserRepository;
@@ -104,14 +105,20 @@ public class UserService {
     public User findUser(final Long id) {
         User user = userRepository.findById(id)
             .orElseThrow(() -> new GlobalException(UserErrorCode.NOT_FOUND_USER));
-        if (user.getDeleted()) {
+
+        if (user.getStatus().equals(UserStatus.PENDING)) {
+            throw new GlobalException(UserErrorCode.NOT_FOUND_USER);
+        }
+
+        if (user.getStatus().equals(UserStatus.WITHDRAWN)) {
             throw new GlobalException(UserErrorCode.DELETED_USER);
         }
+
         return user;
     }
 
     public User findUserByEmail(final String email) {
-        return userRepository.findByEmailAndNotDeleted(email)
+        return userRepository.findByEmail(email)
             .orElseThrow(() -> new GlobalException(EmailErrorCode.NOT_FOUND_EMAIL));
     }
 
