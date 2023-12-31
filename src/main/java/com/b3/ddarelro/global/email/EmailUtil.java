@@ -53,15 +53,12 @@ public class EmailUtil {
     }
 
     public boolean checkCode(String to, String code) {
-        try {
-            EmailAuth emailAuth = emailAuthService.findById(to)
-                .orElseThrow(() -> new GlobalException(
-                    EmailErrorCode.NOT_FOUND_EMAIL));
 
-            return emailAuth.getCode().equals(code);
-        } catch (Exception e) {
-            throw new GlobalException(EmailErrorCode.EXPIRED_CODE);
-        }
+        EmailAuth emailAuth = emailAuthService.findById(to)
+            .orElseThrow(() -> new GlobalException(
+                EmailErrorCode.EXPIRED_CODE));
+
+        return emailAuth.getCode().equals(code);
     }
 
     private MimeMessage createMessage(String to, String subject, String code)

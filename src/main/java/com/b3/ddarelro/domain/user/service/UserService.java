@@ -9,6 +9,7 @@ import com.b3.ddarelro.domain.user.dto.response.UserPasswordUpdateRes;
 import com.b3.ddarelro.domain.user.dto.response.UserRes;
 import com.b3.ddarelro.domain.user.dto.response.UsernameUpdateRes;
 import com.b3.ddarelro.domain.user.entity.User;
+import com.b3.ddarelro.domain.user.exception.EmailErrorCode;
 import com.b3.ddarelro.domain.user.exception.UserErrorCode;
 import com.b3.ddarelro.domain.user.repository.UserRepository;
 import com.b3.ddarelro.domain.userboard.repository.UserBoardRepository;
@@ -26,6 +27,7 @@ public class UserService {
     private final UserBoardRepository userBoardRepository;
     private final PasswordEncoder passwordEncoder;
 
+    // TODO: 탈퇴한 회원이 다시 회원가입할 때 처리
     public void signup(final UserSignupReq reqDto) {
 
         if (userRepository.existsByEmail(reqDto.email())) {
@@ -106,6 +108,11 @@ public class UserService {
             throw new GlobalException(UserErrorCode.DELETED_USER);
         }
         return user;
+    }
+
+    public User findUserByEmail(final String email) {
+        return userRepository.findByEmailAndNotDeleted(email)
+            .orElseThrow(() -> new GlobalException(EmailErrorCode.NOT_FOUND_EMAIL));
     }
 
     private void validateDeleteUser(User user) {
