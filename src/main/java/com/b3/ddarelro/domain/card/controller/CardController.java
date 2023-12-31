@@ -65,12 +65,22 @@ public class CardController {
     @DeleteMapping("/{cardId}")
     public ResponseEntity<CardDeleteRes> deleteCard(@PathVariable Long cardId,
         @RequestBody CardDeleteReq req, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        CardDeleteRes resDto = cardService.deleteCard(cardId, req,
+        CardDeleteRes res = cardService.deleteCard(cardId, req,
             userDetails.getUser());
-        return ResponseEntity.ok().body(resDto);
+        return ResponseEntity.ok().body(res);
     }
 
-    //TODO 카드 콜롬간 이동
-//    @PutMapping
+    @PutMapping("/{cardId}")
+    public ResponseEntity<CardRestoreRes> restoreCard(@PathVariable Long cardId,
+        @RequestBody CardRestoreReq req, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        CardRestoreRes res = cardService.restoreCard(cardId, req, userDetails.getUser());
+        return ResponseEntity.ok().body(res);
+    }
 
+    @PutMapping("/{cardId}/move")
+    public ResponseEntity<CardMoveRes> moveCard(@PathVariable Long cardId,
+        @RequestBody CardMoveReq req, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        CardMoveRes res = cardService.moveCard(cardId, req, userDetails.getUser());
+        return ResponseEntity.ok().body(res);
+    }
 }

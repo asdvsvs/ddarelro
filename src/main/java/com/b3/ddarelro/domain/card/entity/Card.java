@@ -3,7 +3,6 @@ package com.b3.ddarelro.domain.card.entity;
 import com.b3.ddarelro.domain.card.dto.request.*;
 import com.b3.ddarelro.domain.comment.entity.*;
 import com.b3.ddarelro.domain.common.*;
-import com.b3.ddarelro.domain.user.entity.*;
 import jakarta.persistence.*;
 import java.time.*;
 import java.util.*;
@@ -30,9 +29,6 @@ public class Card extends BaseEntity {
     private Long priority;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "column_id")
     private com.b3.ddarelro.domain.column.entity.Column column;
     @OneToMany(mappedBy = "card")
@@ -40,14 +36,13 @@ public class Card extends BaseEntity {
 
     @Builder
     public Card(String name, String description, String color, Boolean deleted, Long priority,
-        User user, com.b3.ddarelro.domain.column.entity.Column column,
+        com.b3.ddarelro.domain.column.entity.Column column,
         List<Comment> commentList) {
         this.name = name;
         this.description = description;
         this.color = color;
         this.deleted = deleted != null ? deleted : false;
         this.priority = priority;
-        this.user = user;
         this.column = column;
         this.commentList = commentList;
     }
@@ -58,11 +53,19 @@ public class Card extends BaseEntity {
         this.color = reqDto.color();
     }
 
-    public void deleteCard() {
+    public void deleteRestoreCard() {
         this.deleted = !this.deleted;
     }
 
     public void setDueDate(LocalDate dueDate) {
         this.dueDate = dueDate;
+    }
+
+    public void moveSpot(Long spot) {
+        this.priority = spot;
+    }
+
+    public void changeColumn(com.b3.ddarelro.domain.column.entity.Column column) {
+        this.column = column;
     }
 }
