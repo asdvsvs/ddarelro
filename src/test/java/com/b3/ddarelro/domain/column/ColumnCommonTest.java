@@ -11,11 +11,11 @@ public interface ColumnCommonTest {
     Board TEST_BOARD = Board.builder()
         .name(TEST_NAME)
         .build();
-    Column TEST_COLUMN = Column.builder()
-        .title(TEST_TITLE)
-        .board(TEST_BOARD)
-        .priority(TEST_ID)
-        .build();
+    //    Column TEST_COLUMN = Column.builder()
+//        .title(TEST_TITLE)
+//        .board(TEST_BOARD)
+//        .priority(TEST_ID)
+//        .build();
     Column TEST_COLUMN2 = Column.builder()
         .title(TEST_TITLE)
         .board(TEST_BOARD)

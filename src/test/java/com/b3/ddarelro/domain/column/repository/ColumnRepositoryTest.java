@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.transaction.annotation.Transactional;
 
 @DataJpaTest
 @ActiveProfiles("test")
@@ -31,9 +32,15 @@ class ColumnRepositoryTest implements ColumnCommonTest {
     private Board saveBoard;
     private Column saveColumn;
     private Column saveAnotherColumn;
+    private Column TEST_COLUMN;
 
     @BeforeEach
     void setUp() {
+        TEST_COLUMN = Column.builder()
+            .title(TEST_TITLE)
+            .board(TEST_BOARD)
+            .priority(TEST_ID)
+            .build();
         saveBoard = boardRepository.save(TEST_BOARD);
         saveColumn = columnRepository.save(TEST_COLUMN);
         saveAnotherColumn = columnRepository.save(TEST_COLUMN2);
@@ -41,6 +48,7 @@ class ColumnRepositoryTest implements ColumnCommonTest {
 
     @Test
     @DisplayName("보드id와 일치하고 삭제되지 않은 컬럼 전체 조회 테스트")
+    @Transactional
     void test1() {
         //given
         Long boardId = TEST_ID;
@@ -57,14 +65,15 @@ class ColumnRepositoryTest implements ColumnCommonTest {
 
     @Test
     @DisplayName("보드id와 일치하고 삭제된 컬럼id 전체 조회 테스트")
+    @Transactional
     void test2() {
         //given
-        Long boardId = TEST_ID;
-
+        Long boardId = TEST_BOARD.getId();
         //when
         ReflectionTestUtils.setField(TEST_COLUMN, "deleted", true);
-        List<Long> columnIdList = columnRepository.findAllByBoardIdAndDeleted(
-            boardId);
+        saveColumn = columnRepository.save(TEST_COLUMN);
+
+        List<Long> columnIdList = columnRepository.findAllByBoardIdAndDeleted(boardId);
 
         //then
         assertThat(columnIdList.get(0)).isEqualTo(TEST_COLUMN.getId());
@@ -73,9 +82,10 @@ class ColumnRepositoryTest implements ColumnCommonTest {
 
     @Test
     @DisplayName("보드id와 일치하는 컬럼 개수 조회 테스트")
+    @Transactional
     void test3() {
         //given
-        Long boardId = TEST_ID;
+        Long boardId = TEST_BOARD.getId();
 
         //when
         Long count = columnRepository.countByBoardId(boardId);

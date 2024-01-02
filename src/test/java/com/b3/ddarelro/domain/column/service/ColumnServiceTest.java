@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.b3.ddarelro.domain.board.service.BoardService;
+import com.b3.ddarelro.domain.card.service.CardDeleteRestoreService;
 import com.b3.ddarelro.domain.column.ColumnCommonTest;
 import com.b3.ddarelro.domain.column.dto.request.ColumnCreateReq;
 import com.b3.ddarelro.domain.column.dto.request.ColumnDeleteReq;
@@ -19,6 +20,7 @@ import com.b3.ddarelro.domain.column.dto.response.ColumnMoveRes;
 import com.b3.ddarelro.domain.column.dto.response.ColumnRestoreRes;
 import com.b3.ddarelro.domain.column.dto.response.ColumnUpdateRes;
 import com.b3.ddarelro.domain.column.dto.response.ColumnsGetRes;
+import com.b3.ddarelro.domain.column.entity.Column;
 import com.b3.ddarelro.domain.column.repository.ColumnRepository;
 import com.b3.ddarelro.domain.user.service.UserService;
 import java.util.List;
@@ -31,6 +33,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.transaction.annotation.Transactional;
 
 @ExtendWith(MockitoExtension.class)
 class ColumnServiceTest implements ColumnCommonTest {
@@ -40,12 +43,20 @@ class ColumnServiceTest implements ColumnCommonTest {
     @Mock
     private ColumnRepository columnRepository;
     @Mock
+    private CardDeleteRestoreService cardDeleteRestoreService;
+    @Mock
     private BoardService boardService;
     @Mock
     private UserService userService;
+    private Column TEST_COLUMN;
 
     @BeforeEach
     void setup() {
+        TEST_COLUMN = Column.builder()
+            .title(TEST_TITLE)
+            .board(TEST_BOARD)
+            .priority(TEST_ID)
+            .build();
         ReflectionTestUtils.setField(TEST_COLUMN.getBoard(), "id", TEST_ID);
         ReflectionTestUtils.setField(TEST_COLUMN, "id", TEST_ID);
     }
@@ -87,6 +98,7 @@ class ColumnServiceTest implements ColumnCommonTest {
 
     @Test
     @DisplayName("컬럼 수정 테스트")
+    @Transactional
     void test3() {
         //given
         ColumnUpdateReq req = ColumnUpdateReq.builder()
@@ -102,6 +114,7 @@ class ColumnServiceTest implements ColumnCommonTest {
 
     @Test
     @DisplayName("컬럼 삭제 테스트")
+    @Transactional
     void test4() {
         //given
         ColumnDeleteReq req = ColumnDeleteReq.builder()
@@ -118,6 +131,7 @@ class ColumnServiceTest implements ColumnCommonTest {
 
     @Test
     @DisplayName("컬럼 복구 테스트")
+    @Transactional
     void test5() {
         //given
         ColumnRestoreReq req = ColumnRestoreReq.builder()
