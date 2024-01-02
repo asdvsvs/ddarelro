@@ -53,6 +53,6 @@ jobs:
       run: aws deploy create-deployment --application-name ddarelro-deploy
         --deployment-config-name CodeDeployDefault.OneAtATime
         --deployment-group-name dev
-        --s3-location bucket=ddarelro-deploy,bundleType=zip,key=$GITHUB_SHA.zip
+        --s3-location bucket=ddarelro-test,bundleType=zip,key=$GITHUB_SHA.zip
 
         
