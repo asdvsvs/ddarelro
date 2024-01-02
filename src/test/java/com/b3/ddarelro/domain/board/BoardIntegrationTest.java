@@ -13,10 +13,7 @@ import com.b3.ddarelro.domain.board.dto.request.BoardInviteReq;
 import com.b3.ddarelro.domain.board.dto.request.BoardLeaveReq;
 import com.b3.ddarelro.domain.board.dto.request.BoardUpdateReq;
 import com.b3.ddarelro.domain.board.dto.response.BoardCreateRes;
-import com.b3.ddarelro.domain.board.dto.response.BoardDeleteRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardDetailRes;
-import com.b3.ddarelro.domain.board.dto.response.BoardDropRes;
-import com.b3.ddarelro.domain.board.dto.response.BoardInviteRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardPriviewRes;
 import com.b3.ddarelro.domain.board.dto.response.BoardUpdateRes;
 import com.b3.ddarelro.domain.board.entity.Board;
@@ -49,6 +46,7 @@ public class BoardIntegrationTest {
 
     @Autowired
     private BoardRepository boardRepository;
+
 
     @Autowired
     private UserBoardRepository userBoardRepository;
@@ -107,9 +105,7 @@ public class BoardIntegrationTest {
             .name("첫번째 보드")
             .build();
 
-        User finduser = userRepository.findById(user.getId()).orElse(null);
-
-        BoardCreateRes res = boardService.createBoard(finduser.getId(), req);
+        BoardCreateRes res = boardService.createBoard(user.getId(), req);
         createdBoardId = res.getId();
         assertNotNull(res);
 
@@ -123,9 +119,7 @@ public class BoardIntegrationTest {
     @DisplayName("보드 단건조회")
     void 보드단건조회() {
 
-        User foundUser = userRepository.findById(user.getId()).orElse(null);
-
-        BoardDetailRes res = boardService.getBoardOne(foundUser.getId(), createdBoardId);
+        BoardDetailRes res = boardService.getBoardOne(user.getId(), createdBoardId);
         assertNotNull(res);
 
         assertEquals("첫번째 보드", res.getName());
@@ -155,14 +149,12 @@ public class BoardIntegrationTest {
     @DisplayName("보드 수정")
     void 보드수정() {
 
-        User foundUser = userRepository.findById(user.getId()).orElse(null);
-
         BoardUpdateReq req = BoardUpdateReq.builder()
             .color(Color.BLUE)
             .description("수정된보드입니다.")
             .build();
 
-        BoardUpdateRes res = boardService.updateBoard(createdBoardId, foundUser.getId(), req);
+        BoardUpdateRes res = boardService.updateBoard(createdBoardId, user.getId(), req);
         assertNotNull(res);
 
         assertEquals(Color.BLUE, res.getColor());
@@ -175,14 +167,13 @@ public class BoardIntegrationTest {
     @DisplayName("보드 멤버초대")
     void 보드멤버초대() {
 
-        User foundUser = userRepository.findById(user.getId()).orElse(null);
         Board foundBoard = boardRepository.findById(createdBoardId).orElse(null);
         User invitedUser = userRepository.findById(otherUser.getId()).orElse(null);
         BoardInviteReq req = BoardInviteReq.builder()
             .userId(invitedUser.getId())
             .build();
 
-        BoardInviteRes res = boardService.inviteMember(foundUser.getId(), createdBoardId, req);
+        boardService.inviteMember(user.getId(), createdBoardId, req);
 
         UserBoard userBoard = userBoardRepository.findByUserAndBoard(invitedUser, foundBoard)
             .orElse(null);
@@ -195,7 +186,7 @@ public class BoardIntegrationTest {
             .userId(otherUser2.getId())
             .build();
 
-        BoardInviteRes res2 = boardService.inviteMember(foundUser.getId(), createdBoardId, req2);
+        boardService.inviteMember(user.getId(), createdBoardId, req2);
 
 
     }
@@ -205,13 +196,12 @@ public class BoardIntegrationTest {
     @DisplayName("보드 멤버초대 실패 - 팀장이 아닌 사람이 초대를 시도")
     void 보드멤버초대실패1() {
 
-        User foundUser = userRepository.findById(otherUser.getId()).orElse(null);
         BoardInviteReq req = BoardInviteReq.builder()
             .userId(otherUser2.getId())
             .build();
 
         GlobalException exception = assertThrows(GlobalException.class, () -> {
-            boardService.inviteMember(foundUser.getId(), createdBoardId, req);
+            boardService.inviteMember(otherUser.getId(), createdBoardId, req);
 
         });
 
@@ -224,13 +214,12 @@ public class BoardIntegrationTest {
     @DisplayName("보드 멤버초대 실패 - 이미 가입된 회원을 초대")
     void 보드멤버초대실패2() {
 
-        User foundUser = userRepository.findById(user.getId()).orElse(null);
         BoardInviteReq req = BoardInviteReq.builder()
             .userId(otherUser.getId())
             .build();
 
         GlobalException exception = assertThrows(GlobalException.class, () -> {
-            boardService.inviteMember(foundUser.getId(), createdBoardId, req);
+            boardService.inviteMember(user.getId(), createdBoardId, req);
         });
 
         assertEquals(BoardErrorCode.ALREADY_BOARD_MEMBER,
@@ -243,14 +232,12 @@ public class BoardIntegrationTest {
     @DisplayName("보드 멤버추방 실패 - 팀장이 아닌애가 추방시도")
     void 보드멤버추방실패1() {
 
-        User foundUser = userRepository.findById(otherUser.getId()).orElse(null);
-
         BoardDropReq req = BoardDropReq.builder()
             .userId(otherUser2.getId())
             .build();
 
         GlobalException exception = assertThrows(GlobalException.class, () -> {
-            boardService.dropMember(foundUser.getId(), createdBoardId, req);
+            boardService.dropMember(otherUser.getId(), createdBoardId, req);
         });
 
         assertEquals(BoardErrorCode.UNAUTHORIZED_ACCESS_BOARD,
@@ -262,7 +249,6 @@ public class BoardIntegrationTest {
     @DisplayName("보드 멤버추방성공")
     void 보드멤버추방성공() {
 
-        User foundUser = userRepository.findById(user.getId()).orElse(null);
         User dropUser = userRepository.findById(otherUser.getId()).orElse(null);
         Board foundBoard = boardRepository.findById(createdBoardId).orElse(null);
 
@@ -270,7 +256,7 @@ public class BoardIntegrationTest {
             .userId(otherUser.getId())
             .build();
 
-        BoardDropRes res = boardService.dropMember(foundUser.getId(), createdBoardId, req);
+        boardService.dropMember(user.getId(), createdBoardId, req);
 
         UserBoard userBoard = userBoardRepository.findByUserAndBoard(dropUser, foundBoard)
             .orElse(null);
@@ -285,10 +271,9 @@ public class BoardIntegrationTest {
     @DisplayName("보드 탈퇴실패 - 팀장이지만 위임할 유저를 선택하지 않았을때")
     void 보드멤버탈퇴실패1() {
 
-        User foundUser = userRepository.findById(user.getId()).orElse(null);
         BoardLeaveReq req = null;
         GlobalException exception = assertThrows(GlobalException.class, () -> {
-            boardService.leaveBoard(foundUser.getId(), createdBoardId, req);
+            boardService.leaveBoard(user.getId(), createdBoardId, req);
         });
 
         assertEquals(BoardErrorCode.REQUIRED_NEW_BOARD_ADMIN,
@@ -327,10 +312,7 @@ public class BoardIntegrationTest {
     @DisplayName("보드삭제")
     void 보드삭제() {
 
-        User foundUser = userRepository.findById(otherUser2.getId()).orElse(null);
-        Board foundBoard = boardRepository.findById(createdBoardId).orElse(null);
-
-        BoardDeleteRes res = boardService.deleteBoard(createdBoardId, foundUser.getId());
+        boardService.deleteBoard(createdBoardId, otherUser2.getId());
 
         Board deletedBoard = boardRepository.findById(createdBoardId).orElse(null);
 
@@ -348,6 +330,19 @@ public class BoardIntegrationTest {
         List<BoardPriviewRes> boardList = boardService.getBoardList(true, "createdAt");
 
         assertTrue(boardList.isEmpty());
+
+    }
+
+    @Test
+    @Order(14)
+    @DisplayName("보드복구")
+    void 삭제된보드복구() {
+
+        boardService.restoreBoard(otherUser2.getId(), createdBoardId);
+
+        Board deletedBoard = boardRepository.findById(createdBoardId).orElse(null);
+
+        assertEquals(deletedBoard.getDeleted(), false);
 
     }
 

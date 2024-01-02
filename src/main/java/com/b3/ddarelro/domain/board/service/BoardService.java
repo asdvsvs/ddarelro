@@ -94,7 +94,8 @@ public class BoardService {
     public BoardRestoreRes restoreBoard(Long userId, Long boardId) {
 
         User founddUser = userService.findUser(userId);
-        Board foundBoard = findBoard(boardId);
+        Board foundBoard = boardRepository.findById(boardId)
+            .orElseThrow(() -> new GlobalException(BoardErrorCode.NOT_FOUND_BOARD));
 
         foundBoard.updateBoardState(false);
         columnDeleteRestoreService.restoreAllColumn(boardId);

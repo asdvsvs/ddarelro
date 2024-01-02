@@ -1,11 +1,9 @@
 package com.b3.ddarelro.domain.card.entity;
 
 import com.b3.ddarelro.domain.card.dto.request.*;
-import com.b3.ddarelro.domain.comment.entity.*;
 import com.b3.ddarelro.domain.common.*;
 import jakarta.persistence.*;
 import java.time.*;
-import java.util.*;
 import lombok.*;
 
 @Entity
@@ -31,20 +29,16 @@ public class Card extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "column_id")
     private com.b3.ddarelro.domain.column.entity.Column column;
-    @OneToMany(mappedBy = "card")
-    private List<Comment> commentList;
 
     @Builder
     public Card(String name, String description, String color, Boolean deleted, Long priority,
-        com.b3.ddarelro.domain.column.entity.Column column,
-        List<Comment> commentList) {
+        com.b3.ddarelro.domain.column.entity.Column column) {
         this.name = name;
         this.description = description;
         this.color = color;
         this.deleted = deleted != null ? deleted : false;
         this.priority = priority;
         this.column = column;
-        this.commentList = commentList;
     }
 
     public void modifyCard(CardModifyReq reqDto) {
