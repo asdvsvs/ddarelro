@@ -2,8 +2,10 @@ package com.b3.ddarelro.domain.card.entity;
 
 import com.b3.ddarelro.domain.card.dto.request.*;
 import com.b3.ddarelro.domain.common.*;
+import com.b3.ddarelro.domain.worker.entity.*;
 import jakarta.persistence.*;
 import java.time.*;
+import java.util.*;
 import lombok.*;
 
 @Entity
@@ -29,6 +31,8 @@ public class Card extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "column_id")
     private com.b3.ddarelro.domain.column.entity.Column column;
+    @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Worker> worker;
 
     @Builder
     public Card(String name, String description, String color, Boolean deleted, Long priority,
