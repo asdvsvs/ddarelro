@@ -2,6 +2,7 @@ package com.b3.ddarelro.domain.column.service;
 
 import com.b3.ddarelro.domain.board.entity.Board;
 import com.b3.ddarelro.domain.board.service.BoardService;
+import com.b3.ddarelro.domain.card.service.CardDeleteRestoreService;
 import com.b3.ddarelro.domain.column.dto.request.ColumnCreateReq;
 import com.b3.ddarelro.domain.column.dto.request.ColumnDeleteReq;
 import com.b3.ddarelro.domain.column.dto.request.ColumnGetReq;
@@ -33,7 +34,7 @@ public class ColumnService {
     private final ColumnRepository columnRepository;
     private final BoardService boardService;
     private final UserService userService;
-//    private final CardDeleteRestoreService cardDeleteRestoreService;
+    private final CardDeleteRestoreService cardDeleteRestoreService;
 
     public ColumnCreateRes createColumn(ColumnCreateReq req, Long userId) {
         Board board = getBoardAndLeaderCheck(req.boardId(), userId);
@@ -83,7 +84,7 @@ public class ColumnService {
 
         Column column = findColumn(columnId);
         column.delete();
-//        cardDeleteRestoreService.deleteAllCard(List.of(columnId));
+        cardDeleteRestoreService.deleteAllCard(List.of(columnId));
 
         return ColumnDeleteRes.builder()
             .title(column.getTitle())
@@ -98,7 +99,7 @@ public class ColumnService {
         Column column = columnRepository.findById(columnId)
             .orElseThrow(() -> new GlobalException(ColumnErrorCode.NOT_FOUND));
         column.restore();
-//        cardDeleteRestoreService.restoreAllCard(List.of(columnId));
+        cardDeleteRestoreService.restoreAllCard(List.of(columnId));
 
         return ColumnRestoreRes.builder()
             .title(column.getTitle())
