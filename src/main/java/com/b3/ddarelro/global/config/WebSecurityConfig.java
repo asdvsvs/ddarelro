@@ -1,7 +1,7 @@
 package com.b3.ddarelro.global.config;
 
 
-import com.b3.ddarelro.global.jwt.JwtUtil;
+import com.b3.ddarelro.global.jwt.TokenProvider;
 import com.b3.ddarelro.global.security.JwtAuthenticationFilter;
 import com.b3.ddarelro.global.security.JwtAuthorizationFilter;
 import com.b3.ddarelro.global.security.UserDetailsServiceImpl;
@@ -24,7 +24,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class WebSecurityConfig {
 
-    private final JwtUtil jwtUtil;
+    private final TokenProvider tokenProvider;
     private final UserDetailsServiceImpl userDetailsService;
     private final AuthenticationConfiguration authenticationConfiguration;
 
@@ -41,14 +41,14 @@ public class WebSecurityConfig {
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
-        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtUtil);
+        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(tokenProvider);
         filter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
         return filter;
     }
 
     @Bean
     public JwtAuthorizationFilter jwtAuthorizationFilter() {
-        return new JwtAuthorizationFilter(jwtUtil, userDetailsService);
+        return new JwtAuthorizationFilter(tokenProvider, userDetailsService);
     }
 
     @Bean

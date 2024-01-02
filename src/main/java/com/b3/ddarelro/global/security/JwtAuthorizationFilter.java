@@ -1,7 +1,7 @@
 package com.b3.ddarelro.global.security;
 
 import com.b3.ddarelro.global.exception.ErrorResponse;
-import com.b3.ddarelro.global.jwt.JwtUtil;
+import com.b3.ddarelro.global.jwt.TokenProvider;
 import com.b3.ddarelro.global.security.exception.SecurityErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
@@ -26,19 +26,20 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @RequiredArgsConstructor
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
-    private final JwtUtil jwtUtil;
+    private final TokenProvider tokenProvider;
     private final UserDetailsServiceImpl userDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
         FilterChain filterChain) throws ServletException, IOException {
 
-        String accessToken = jwtUtil.getTokenFromHeader(request, JwtUtil.ACCESS_TOKEN_HEADER);
+        String accessToken = tokenProvider.getTokenFromHeader(request,
+            TokenProvider.ACCESS_TOKEN_HEADER);
 
         //TODO: AccessToken 만료시 RefreshToken을 사용하여 AccessToken 재발급
 
         if (StringUtils.hasText(accessToken)) {
-            if (!jwtUtil.validateToken(accessToken)) {
+            if (!tokenProvider.validateToken(accessToken)) {
                 log.error("Token Error");
                 // 토큰이 유효하지 않음을 JSON 형식으로 응답 메시지, 상태코드 생성
                 sendErrorResponse(response,
@@ -47,7 +48,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 return;
             }
 
-            Claims info = jwtUtil.getUserInfoFromToken(accessToken);
+            Claims info = tokenProvider.getUserInfoFromToken(accessToken);
 
             try {
                 setAuthentication(info.getSubject());

@@ -4,7 +4,7 @@ package com.b3.ddarelro.global.security;
 import com.b3.ddarelro.domain.user.dto.request.UserLoginReq;
 import com.b3.ddarelro.domain.user.dto.response.UserLoginRes;
 import com.b3.ddarelro.domain.user.entity.User;
-import com.b3.ddarelro.global.jwt.JwtUtil;
+import com.b3.ddarelro.global.jwt.TokenProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,10 +20,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Slf4j(topic = "로그인 및 AccessToken RefreshToken 생성")
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-    private final JwtUtil jwtUtil;
+    private final TokenProvider tokenProvider;
 
-    public JwtAuthenticationFilter(JwtUtil jwtUtil) {
-        this.jwtUtil = jwtUtil;
+    public JwtAuthenticationFilter(TokenProvider tokenProvider) {
+        this.tokenProvider = tokenProvider;
         setFilterProcessesUrl("/api/users/login");
     }
 
@@ -52,8 +52,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         User user = ((UserDetailsImpl) authResult.getPrincipal()).getUser();
 
-        String accessToken = jwtUtil.createAccessToken(user.getEmail());
-        response.addHeader(JwtUtil.ACCESS_TOKEN_HEADER, accessToken);
+        String accessToken = tokenProvider.createAccessToken(user.getEmail());
+        response.addHeader(TokenProvider.ACCESS_TOKEN_HEADER, accessToken);
         // TODO: RefreshToken 구현시 헤더 추가 후 레디스에 저장
 
         sendResponse(response, "로그인에 성공했습니다.");

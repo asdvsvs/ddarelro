@@ -19,7 +19,7 @@ import org.springframework.util.StringUtils;
 
 @Slf4j(topic = "JwtUtil")
 @Component
-public class JwtUtil {
+public class TokenProvider {
 
     public static final String ACCESS_TOKEN_HEADER = "AccessToken";
     public static final String REFRESH_TOKEN_HEADER = "RefreshToken";
