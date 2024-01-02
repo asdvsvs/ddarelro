@@ -36,14 +36,6 @@ public class CardController {
         return ResponseEntity.ok().body(cardService.getCard(cardId, req, userDetails.getUser()));
     }
 
-    //TODO 카드 작업자 할당
-//    @PutMapping("/{cardId}")
-//    public ResponseEntity<CardWorkersRes> addWorkers(@PathVariable Long cardId,
-//        @RequestBody CardWorkersReq req, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-//        CardWorkersRes res = cardService.addWorkers(cardId, req, userDetails.getUser());
-//        return ResponseEntity.ok().body(res);
-//    }
-
     @PatchMapping("/{cardId}")
     public ResponseEntity<CardModifyRes> modifyCard(@PathVariable Long cardId,
         @RequestBody CardModifyReq req, @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -76,4 +68,11 @@ public class CardController {
         @RequestBody CardMoveReq req, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok().body(cardService.moveCard(cardId, req, userDetails.getUser()));
     }
+
+    //TODO 카드 작업자 할당
+//    @PutMapping("/{cardId}")
+//    public ResponseEntity<List<CardWorkersRes>> addWorkers(@PathVariable Long cardId,
+//        @RequestBody CardWorkersReq req, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+//        return ResponseEntity.ok().body(cardService.addWorkers(cardId, req, userDetails.getUser()));
+//    }
 }
