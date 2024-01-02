@@ -1,8 +1,13 @@
 package com.b3.ddarelro.global.security;
 
+import static com.b3.ddarelro.global.jwt.TokenProvider.ACCESS_TOKEN_HEADER;
+import static com.b3.ddarelro.global.jwt.TokenProvider.BEARER_PREFIX;
+import static com.b3.ddarelro.global.jwt.TokenProvider.REFRESH_TOKEN_HEADER;
+
 import com.b3.ddarelro.global.exception.ErrorResponse;
-import com.b3.ddarelro.global.jwt.JwtUtil;
-import com.b3.ddarelro.global.security.exception.SecurityErrorCode;
+import com.b3.ddarelro.global.exception.GlobalException;
+import com.b3.ddarelro.global.jwt.TokenProvider;
+import com.b3.ddarelro.global.jwt.service.TokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -26,28 +31,35 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @RequiredArgsConstructor
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
-    private final JwtUtil jwtUtil;
+    private final TokenProvider tokenProvider;
     private final UserDetailsServiceImpl userDetailsService;
+    private final TokenService tokenService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
         FilterChain filterChain) throws ServletException, IOException {
 
-        String accessToken = jwtUtil.getTokenFromHeader(request, JwtUtil.ACCESS_TOKEN_HEADER);
+        String accessToken = tokenProvider.getTokenFromHeader(request, ACCESS_TOKEN_HEADER);
 
-        //TODO: AccessToken 만료시 RefreshToken을 사용하여 AccessToken 재발급
+        if (StringUtils.hasText(accessToken) && !tokenProvider.validateToken(accessToken)) {
+            String refreshToken = tokenProvider.getTokenFromHeader(request, REFRESH_TOKEN_HEADER);
 
-        if (StringUtils.hasText(accessToken)) {
-            if (!jwtUtil.validateToken(accessToken)) {
-                log.error("Token Error");
-                // 토큰이 유효하지 않음을 JSON 형식으로 응답 메시지, 상태코드 생성
-                sendErrorResponse(response,
-                    SecurityErrorCode.INVALID_TOKEN.getHttpStatus().value(),
-                    SecurityErrorCode.INVALID_TOKEN.getMessage());
+            try {
+                accessToken = tokenService.generateAccessToken(refreshToken);
+            } catch (GlobalException e) {
+                log.error("RefreshToken Error");
+                sendErrorResponse(
+                    response,
+                    e.getErrorCode().getHttpStatus().value(),
+                    e.getErrorCode().getMessage()
+                );
                 return;
             }
+            response.addHeader(ACCESS_TOKEN_HEADER, BEARER_PREFIX + accessToken);
+        }
 
-            Claims info = jwtUtil.getUserInfoFromToken(accessToken);
+        if (StringUtils.hasText(accessToken)) {
+            Claims info = tokenProvider.getUserInfoFromToken(accessToken);
 
             try {
                 setAuthentication(info.getSubject());

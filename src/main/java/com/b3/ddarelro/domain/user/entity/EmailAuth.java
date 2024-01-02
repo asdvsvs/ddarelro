@@ -9,7 +9,7 @@ import org.springframework.data.redis.core.RedisHash;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@RedisHash(value = "emailAuth", timeToLive = 100) // redis 사용, 유효기간 10분
+@RedisHash(value = "emailAuth", timeToLive = 600) // redis 사용, 유효기간 10분
 public class EmailAuth {
 
     @Id
