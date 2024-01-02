@@ -12,6 +12,7 @@ import com.b3.ddarelro.domain.comment.service.*;
 import com.b3.ddarelro.domain.file.service.*;
 import com.b3.ddarelro.domain.user.entity.*;
 import com.b3.ddarelro.domain.user.service.*;
+import com.b3.ddarelro.domain.worker.*;
 import com.b3.ddarelro.domain.worker.entity.*;
 import com.b3.ddarelro.domain.worker.repository.*;
 import com.b3.ddarelro.global.exception.*;
@@ -66,10 +67,20 @@ public class CardService {
     public CardRes getCard(Long cardId, CardReq req, User user) {
         userService.findUser(user.getId());
         columnService.findColumn(req.columnId());
-
         Card card = findCard(cardId);
 
-        return CardRes.formWith(card);
+        List<WorkersRes> workersRes = getWorkers(card);
+
+        return CardRes.formWith(card, workersRes);
+    }
+
+    private static List<WorkersRes> getWorkers(Card card) {
+        List<WorkersRes> workersRes = new ArrayList<>();
+        List<Worker> assignedWorkers = card.getWorkers();
+        for (Worker worker : assignedWorkers) {
+            workersRes.add(WorkersRes.formWith(worker));
+        }
+        return workersRes;
     }
 
     @Transactional

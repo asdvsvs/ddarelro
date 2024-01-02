@@ -32,7 +32,7 @@ public class Card extends BaseEntity {
     @JoinColumn(name = "column_id")
     private com.b3.ddarelro.domain.column.entity.Column column;
     @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Worker> worker;
+    private List<Worker> workers;
 
     @Builder
     public Card(String name, String description, String color, Boolean deleted, Long priority,
