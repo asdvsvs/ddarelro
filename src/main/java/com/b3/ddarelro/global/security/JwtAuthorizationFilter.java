@@ -2,7 +2,7 @@ package com.b3.ddarelro.global.security;
 
 import com.b3.ddarelro.global.exception.ErrorResponse;
 import com.b3.ddarelro.global.jwt.TokenProvider;
-import com.b3.ddarelro.global.security.exception.SecurityErrorCode;
+import com.b3.ddarelro.global.jwt.exception.TokenErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -43,8 +43,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 log.error("Token Error");
                 // 토큰이 유효하지 않음을 JSON 형식으로 응답 메시지, 상태코드 생성
                 sendErrorResponse(response,
-                    SecurityErrorCode.INVALID_TOKEN.getHttpStatus().value(),
-                    SecurityErrorCode.INVALID_TOKEN.getMessage());
+                    TokenErrorCode.INVALID_TOKEN.getHttpStatus().value(),
+                    TokenErrorCode.INVALID_TOKEN.getMessage());
                 return;
             }
 
