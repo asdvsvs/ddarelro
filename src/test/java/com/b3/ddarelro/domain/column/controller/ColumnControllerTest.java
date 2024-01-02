@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.b3.ddarelro.domain.column.ColumnCommonTest;
 import com.b3.ddarelro.domain.column.dto.request.ColumnCreateReq;
 import com.b3.ddarelro.domain.column.dto.request.ColumnDeleteReq;
 import com.b3.ddarelro.domain.column.dto.request.ColumnGetReq;
@@ -42,7 +43,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 @WebMvcTest(controllers = {ColumnController.class})
-class ColumnControllerTest {
+class ColumnControllerTest implements ColumnCommonTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -73,9 +74,9 @@ class ColumnControllerTest {
     void test1() throws Exception {
         //given
         ColumnCreateReq req = ColumnCreateReq.builder()
-            .boardId(1L).title("testTitle").build();
+            .boardId(TEST_ID).title(TEST_TITLE).build();
         ColumnCreateRes res = ColumnCreateRes.builder()
-            .boardId(1L).columnId(1L).title("testTitle").build();
+            .boardId(TEST_ID).columnId(TEST_ID).title(TEST_TITLE).build();
 
         //when
         when(columnService.createColumn(any(), any())).thenReturn(res);
@@ -95,9 +96,9 @@ class ColumnControllerTest {
     void test2() throws Exception {
         //given
         ColumnGetReq req = ColumnGetReq.builder()
-            .boardId(1L).build();
+            .boardId(TEST_ID).build();
         ColumnsGetRes res = ColumnsGetRes.builder()
-            .columnId(1L).title("testTitle").priority(1L).build();
+            .columnId(TEST_ID).title(TEST_TITLE).priority(1L).build();
         List<ColumnsGetRes> list = List.of(res);
 
         //when
@@ -118,9 +119,9 @@ class ColumnControllerTest {
     void test3() throws Exception {
         //given
         ColumnUpdateReq req = ColumnUpdateReq.builder()
-            .boardId(1L).title("testTitle").build();
+            .boardId(TEST_ID).title(TEST_TITLE).build();
         ColumnUpdateRes res = ColumnUpdateRes.builder()
-            .title("testTitle").build();
+            .title(TEST_TITLE).build();
 
         //when
         when(columnService.updateColumn(any(), any(), any())).thenReturn(res);
@@ -140,9 +141,9 @@ class ColumnControllerTest {
     void test4() throws Exception {
         //given
         ColumnDeleteReq req = ColumnDeleteReq.builder()
-            .boardId(1L).build();
+            .boardId(TEST_ID).build();
         ColumnDeleteRes res = ColumnDeleteRes.builder()
-            .title("testTitle").deleted(true).build();
+            .title(TEST_TITLE).deleted(true).build();
 
         //when
         when(columnService.deleteColumn(any(), any(), any())).thenReturn(res);
@@ -162,9 +163,9 @@ class ColumnControllerTest {
     void test5() throws Exception {
         //given
         ColumnRestoreReq req = ColumnRestoreReq.builder()
-            .boardId(1L).build();
+            .boardId(TEST_ID).build();
         ColumnRestoreRes res = ColumnRestoreRes.builder()
-            .title("testTitle").deleted(false).build();
+            .title(TEST_TITLE).deleted(false).build();
 
         //when
         when(columnService.restoreColumn(any(), any(), any())).thenReturn(res);
@@ -184,9 +185,9 @@ class ColumnControllerTest {
     void test6() throws Exception {
         //given
         ColumnMoveReq req = ColumnMoveReq.builder()
-            .boardId(1L).move(2L).build();
+            .boardId(TEST_ID).move(2L).build();
         ColumnMoveRes res = ColumnMoveRes.builder()
-            .ColumnId(1L).title("testTitle").priority(2L).build();
+            .ColumnId(TEST_ID).title(TEST_TITLE).priority(2L).build();
 
         //when
         when(columnService.moveColumn(any(), any(), any())).thenReturn(res);
