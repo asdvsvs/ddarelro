@@ -65,6 +65,7 @@ public class WebSecurityConfig {
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
                 .permitAll()
                 .requestMatchers("/api/users/signup/**").permitAll()
+                .requestMatchers("/api/email/**").permitAll()
                 .anyRequest().authenticated()
         );
         http.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
