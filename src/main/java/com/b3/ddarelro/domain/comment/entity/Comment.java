@@ -11,7 +11,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,6 +26,8 @@ public class Comment extends BaseEntity {
 
     private String content;
 
+    private Boolean deleted;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private Card card;
 
@@ -38,7 +39,11 @@ public class Comment extends BaseEntity {
         this.content = content;
         this.card = card;
         this.user = user;
+        deleted = false;
     }
 
 
+    public void update(String content) {
+        this.content = content;
+    }
 }

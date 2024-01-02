@@ -3,11 +3,12 @@ package com.b3.ddarelro.global.exception;
 import lombok.Getter;
 
 @Getter
-public class GlobalException extends RuntimeException{
+public class GlobalException extends RuntimeException {
 
-    SampleErrorCode sampleErrorCode;
+    private ErrorCode errorCode;
 
-    public GlobalException(SampleErrorCode sampleErrorCode) {
-        this.sampleErrorCode = sampleErrorCode;
+    public GlobalException(ErrorCode errorCode) {
+        super(errorCode.getMessage());
+        this.errorCode = errorCode;
     }
 }

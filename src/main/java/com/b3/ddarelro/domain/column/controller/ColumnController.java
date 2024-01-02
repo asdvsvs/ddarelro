@@ -1,12 +1,89 @@
 package com.b3.ddarelro.domain.column.controller;
 
+import com.b3.ddarelro.domain.column.dto.request.ColumnCreateReq;
+import com.b3.ddarelro.domain.column.dto.request.ColumnDeleteReq;
+import com.b3.ddarelro.domain.column.dto.request.ColumnGetReq;
+import com.b3.ddarelro.domain.column.dto.request.ColumnMoveReq;
+import com.b3.ddarelro.domain.column.dto.request.ColumnRestoreReq;
+import com.b3.ddarelro.domain.column.dto.request.ColumnUpdateReq;
+import com.b3.ddarelro.domain.column.dto.response.ColumnCreateRes;
+import com.b3.ddarelro.domain.column.dto.response.ColumnDeleteRes;
+import com.b3.ddarelro.domain.column.dto.response.ColumnMoveRes;
+import com.b3.ddarelro.domain.column.dto.response.ColumnRestoreRes;
+import com.b3.ddarelro.domain.column.dto.response.ColumnUpdateRes;
+import com.b3.ddarelro.domain.column.dto.response.ColumnsGetRes;
+import com.b3.ddarelro.domain.column.service.ColumnService;
+import com.b3.ddarelro.global.security.UserDetailsImpl;
+import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/columns")
 @RequiredArgsConstructor
 public class ColumnController {
+
+    private final ColumnService columnService;
+
+    @PostMapping
+    public ResponseEntity<ColumnCreateRes> createColumn(@Valid @RequestBody ColumnCreateReq req,
+        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        ColumnCreateRes res = columnService.createColumn(req, userDetails.getUser().getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(res);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ColumnsGetRes>> getColumns(@Valid @RequestBody ColumnGetReq req,
+        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        List<ColumnsGetRes> res = columnService.getColumns(req, userDetails.getUser().getId());
+        return ResponseEntity.status(HttpStatus.OK).body(res);
+    }
+
+    @PutMapping("/{columnId}")
+    public ResponseEntity<ColumnUpdateRes> updateColumn(@PathVariable Long columnId,
+        @Valid @RequestBody ColumnUpdateReq req,
+        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        ColumnUpdateRes res = columnService.updateColumn(columnId, req,
+            userDetails.getUser().getId());
+        return ResponseEntity.status(HttpStatus.OK).body(res);
+    }
+
+    @DeleteMapping("/{columnId}")
+    public ResponseEntity<ColumnDeleteRes> deleteColumn(@PathVariable Long columnId,
+        @Valid @RequestBody ColumnDeleteReq req,
+        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        ColumnDeleteRes res = columnService.deleteColumn(columnId, req,
+            userDetails.getUser().getId());
+        return ResponseEntity.status(HttpStatus.OK).body(res);
+    }
+
+    @PatchMapping("/{columnId}/restore")
+    public ResponseEntity<ColumnRestoreRes> restoreColumn(@PathVariable Long columnId,
+        @Valid @RequestBody ColumnRestoreReq req,
+        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        ColumnRestoreRes res = columnService.restoreColumn(columnId, req,
+            userDetails.getUser().getId());
+        return ResponseEntity.status(HttpStatus.OK).body(res);
+    }
+
+    @PutMapping("/{columnId}/move")
+    public ResponseEntity<ColumnMoveRes> moveColumn(@PathVariable Long columnId,
+        @Valid @RequestBody ColumnMoveReq req,
+        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        ColumnMoveRes res = columnService.moveColumn(columnId, req, userDetails.getUser().getId());
+        return ResponseEntity.status(HttpStatus.OK).body(res);
+    }
 
 }
