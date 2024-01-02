@@ -21,9 +21,11 @@ import org.springframework.util.StringUtils;
 @Component
 public class JwtUtil {
 
-    public static final String ACCESS_TOKEN_HEADER = "Authorization";
+    public static final String ACCESS_TOKEN_HEADER = "AccessToken";
+    public static final String REFRESH_TOKEN_HEADER = "RefreshToken";
     public static final String BEARER_PREFIX = "Bearer ";
     public final long ACCESS_TOKEN_TIME = 60 * 30 * 1000L;
+    public final long REFRESH_TOKEN_TIME = 60 * 60 * 1000L * 24 * 14;
 
     @Value("${jwt.secret.key}")
     private String secretKey;
@@ -49,6 +51,17 @@ public class JwtUtil {
     }
 
     // TODO: createRefreshToken
+    public String createRefreshToken(String email) {
+        Date date = new Date();
+
+        return BEARER_PREFIX +
+            Jwts.builder()
+                .setSubject(email)
+                .setExpiration(new Date(date.getTime() + REFRESH_TOKEN_TIME))
+                .setIssuedAt(date)
+                .signWith(key, signatureAlgorithm)
+                .compact();
+    }
 
     public String getTokenFromHeader(HttpServletRequest request, String tokenType) {
         String token = request.getHeader(tokenType);
