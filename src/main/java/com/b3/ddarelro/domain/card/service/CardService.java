@@ -151,7 +151,7 @@ public class CardService {
         userService.findUser(user.getId());
         Column column = columnService.findColumn(req.columnId());
 
-        List<Long> cardIdList = findCardIdsByColumn(cardId, user, column);
+        List<Long> cardIdList = findCardIdsByColumn(cardId, column);
         commentDeleteRestoreService.deleteAllComment(cardIdList);
         fileDeleteRestoreService.deleteAllFiles(cardIdList);
         checkListDeleteRestoreService.deleteAllComment(cardIdList);
@@ -163,7 +163,7 @@ public class CardService {
         userService.findUser(user.getId());
         Column column = columnService.findColumn(req.columnId());
 
-        List<Long> cardIdList = findCardIdsByColumn(cardId, user, column);
+        List<Long> cardIdList = findCardIdsByColumn(cardId, column);
         commentDeleteRestoreService.restoreAllComment(cardIdList);
         fileDeleteRestoreService.restoreAllFiles(cardIdList);
         checkListDeleteRestoreService.restoreAllComment(cardIdList);
@@ -190,7 +190,7 @@ public class CardService {
         return dueDate;
     }
 
-    private List<Long> findCardIdsByColumn(Long cardId, User user, Column column) {
+    private List<Long> findCardIdsByColumn(Long cardId, Column column) {
         Card card = findCard(cardId);
         card.deleteRestoreCard();
         List<Card> cardList = cardRepository.findAllByColumnIdAndNotDeleted(column.getId());
