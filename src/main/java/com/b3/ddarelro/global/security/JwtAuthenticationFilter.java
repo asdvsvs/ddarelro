@@ -1,5 +1,7 @@
 package com.b3.ddarelro.global.security;
 
+import static com.b3.ddarelro.global.jwt.TokenProvider.ACCESS_TOKEN_HEADER;
+import static com.b3.ddarelro.global.jwt.TokenProvider.REFRESH_TOKEN_HEADER;
 
 import com.b3.ddarelro.domain.user.dto.request.UserLoginReq;
 import com.b3.ddarelro.domain.user.dto.response.UserLoginRes;
@@ -58,8 +60,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String accessToken = tokenProvider.createAccessToken(user.getEmail());
         String refreshToken = tokenProvider.createRefreshToken(user.getEmail());
 
-        response.addHeader(TokenProvider.ACCESS_TOKEN_HEADER, accessToken);
-        response.addHeader(TokenProvider.REFRESH_TOKEN_HEADER, refreshToken);
+        response.addHeader(ACCESS_TOKEN_HEADER, accessToken);
+        response.addHeader(REFRESH_TOKEN_HEADER, refreshToken);
 
         refreshToken = refreshToken.split(" ")[1].trim();
 
