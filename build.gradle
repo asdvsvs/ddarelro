@@ -57,8 +57,20 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
 
-    //s3
+    // s3
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
+    // redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // email
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    // context
+    implementation 'org.springframework:spring-context-support'
+
+    // thymeleaf
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
     //Repository 테스트용
     runtimeOnly 'com.h2database:h2'

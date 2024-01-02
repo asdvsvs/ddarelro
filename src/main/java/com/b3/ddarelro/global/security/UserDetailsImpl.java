@@ -2,6 +2,7 @@ package com.b3.ddarelro.global.security;
 
 
 import com.b3.ddarelro.domain.user.entity.User;
+import com.b3.ddarelro.domain.user.entity.UserStatus;
 import java.util.Collection;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +51,6 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return user.getStatus().equals(UserStatus.ACTIVE);
     }
 }

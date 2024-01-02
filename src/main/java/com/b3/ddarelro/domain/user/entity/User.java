@@ -3,6 +3,8 @@ package com.b3.ddarelro.domain.user.entity;
 import com.b3.ddarelro.domain.common.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -32,14 +34,15 @@ public class User extends BaseEntity {
     private String password;
 
     @Column(nullable = false)
-    private Boolean Deleted;
+    @Enumerated(EnumType.STRING)
+    private UserStatus status;
 
     @Builder
     private User(String email, String username, String password) {
         this.email = email;
         this.username = username;
         this.password = password;
-        this.Deleted = false;
+        this.status = UserStatus.PENDING;
     }
 
     public void updateUsername(String username) {
@@ -48,5 +51,13 @@ public class User extends BaseEntity {
 
     public void updatePassword(String password) {
         this.password = password;
+    }
+
+    public void delete() {
+        this.status = UserStatus.WITHDRAWN;
+    }
+
+    public void updateStatus() {
+        this.status = UserStatus.ACTIVE;
     }
 }

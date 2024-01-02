@@ -5,6 +5,7 @@ import com.b3.ddarelro.domain.user.entity.User;
 import com.b3.ddarelro.domain.userboard.entity.UserBoard;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 public interface UserBoardRepository extends JpaRepository<UserBoard, Long> {
 
@@ -12,4 +13,6 @@ public interface UserBoardRepository extends JpaRepository<UserBoard, Long> {
 
     Boolean existsByUserAndBoard(User user, Board board);
 
+    @Query("select count(ub) from UserBoard ub where ub.user = :user and ub.boardAuthority = 'ADMIN'")
+    Long countAdminUserBoards(User user);
 }

@@ -74,6 +74,7 @@ public class BoardIntegrationTest {
             .password("123456789")
             .email("123@naver.com")
             .build();
+        user1.updateStatus();
         user = userRepository.save(user1);
 
         User user2 = User.builder()
@@ -81,7 +82,7 @@ public class BoardIntegrationTest {
             .email("test1@test.com")
             .password("12345678")
             .build();
-
+        user2.updateStatus();
         otherUser = userRepository.save(user2);
 
         User user3 = User.builder()
@@ -89,7 +90,7 @@ public class BoardIntegrationTest {
             .email("test2@test.com")
             .password("123456789")
             .build();
-
+        user3.updateStatus();
         otherUser2 = userRepository.save(user3);
 
 
