@@ -12,6 +12,7 @@ import com.b3.ddarelro.domain.board.entity.Color;
 import com.b3.ddarelro.domain.board.service.BoardService;
 import com.b3.ddarelro.domain.user.entity.User;
 import com.b3.ddarelro.global.config.MockSpringSecurityFilter;
+import com.b3.ddarelro.global.config.WebSecurityConfig;
 import com.b3.ddarelro.global.security.UserDetailsImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.security.Principal;
@@ -33,8 +34,8 @@ import org.springframework.web.context.WebApplicationContext;
     controllers = {BoardController.class},
     excludeFilters = {
         @ComponentScan.Filter(
-            type = FilterType.ASSIGNABLE_TYPE
-            //classes = WebSecurityConfig.class //
+            type = FilterType.ASSIGNABLE_TYPE,
+            classes = WebSecurityConfig.class //
         )
     }
 )
