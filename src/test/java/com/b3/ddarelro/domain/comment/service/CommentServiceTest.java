@@ -59,7 +59,6 @@ class CommentServiceTest {
             .password("1234")
             .build();
         card = Card.builder()
-            .user(user)
             .color("BLUE")
             .description("des")
             .name("name")
