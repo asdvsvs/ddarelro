@@ -8,7 +8,6 @@ import lombok.*;
 public record CardCreateRes(
     Long id,
     String name,
-    String username,
     String description,
     String color,
     LocalDate dueDate,
@@ -22,7 +21,6 @@ public record CardCreateRes(
         return CardCreateRes.builder()
             .id(card.getId())
             .name(card.getName())
-            .username(card.getUser().getUsername())
             .description(card.getDescription())
             .color(card.getColor())
             .dueDate(card.getDueDate())

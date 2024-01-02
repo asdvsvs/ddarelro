@@ -30,6 +30,8 @@ public class CardService {
     private final CommentDeleteRestoreService commentDeleteRestoreService;
     private final FileDeleteRestoreService fileDeleteRestoreService;
     private final CheckListDeleteRestoreService checkListDeleteRestoreService;
+//    private final WorkerRepository workerRepository;
+
 
     @Transactional
     public CardCreateRes createCard(CardCreateReq req, User user) {
@@ -149,7 +151,7 @@ public class CardService {
         userService.findUser(user.getId());
         Column column = columnService.findColumn(req.columnId());
 
-        List<Long> cardIdList = findCardIdsByColumn(cardId, user, column);
+        List<Long> cardIdList = findCardIdsByColumn(cardId, column);
         commentDeleteRestoreService.deleteAllComment(cardIdList);
         fileDeleteRestoreService.deleteAllFiles(cardIdList);
         checkListDeleteRestoreService.deleteAllComment(cardIdList);
@@ -161,12 +163,22 @@ public class CardService {
         userService.findUser(user.getId());
         Column column = columnService.findColumn(req.columnId());
 
-        List<Long> cardIdList = findCardIdsByColumn(cardId, user, column);
+        List<Long> cardIdList = findCardIdsByColumn(cardId, column);
         commentDeleteRestoreService.restoreAllComment(cardIdList);
         fileDeleteRestoreService.restoreAllFiles(cardIdList);
         checkListDeleteRestoreService.restoreAllComment(cardIdList);
         return CardRestoreRes.builder().msg("카드가 복구 됬어요!").build();
     }
+
+    //TODO 작업자 할당
+//    public List<CardWorkersRes> addWorkers(Long cardId, CardWorkersReq req, User user) {
+//        userService.findUser(user.getId());
+//        Column column = columnService.findColumn(req.columnId());
+//        Card card = findCard(cardId);
+//        //작업 할당은 팀장급? => 팀장인지 체크
+//
+//        return null;
+//    }
 
     private static LocalDate getDueDate(CardDueDateReq req) {
         int year = req.year();
@@ -178,7 +190,7 @@ public class CardService {
         return dueDate;
     }
 
-    private List<Long> findCardIdsByColumn(Long cardId, User user, Column column) {
+    private List<Long> findCardIdsByColumn(Long cardId, Column column) {
         Card card = findCard(cardId);
         card.deleteRestoreCard();
         List<Card> cardList = cardRepository.findAllByColumnIdAndNotDeleted(column.getId());
@@ -189,5 +201,4 @@ public class CardService {
         return cardRepository.findById(cardId)
             .orElseThrow(() -> new GlobalException(CardErrorCode.NOT_FOUND));
     }
-
 }
