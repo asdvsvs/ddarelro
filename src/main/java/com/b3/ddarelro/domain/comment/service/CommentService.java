@@ -38,7 +38,7 @@ public class CommentService {
         User user = userService.findUser(userId);
         Card card = cardService.findCard(req.cardId());
         Comment comment = Comment.builder().content(req.content()).card(card).user(user).build();
-        commentRepository.save(comment);
+        comment = commentRepository.save(comment);
         return CommentCreateRes.builder().id(comment.getId()).content(comment.getContent()).build();
     }
 
@@ -69,6 +69,7 @@ public class CommentService {
                 .id(comment.getId())
                 .content(comment.getContent())
                 .username(comment.getUser().getUsername())
+                .createdAt(comment.getCreatedAt())
                 .build())
             .toList();
     }

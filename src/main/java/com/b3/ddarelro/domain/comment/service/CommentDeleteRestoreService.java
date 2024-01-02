@@ -17,7 +17,7 @@ public class CommentDeleteRestoreService {
      * Card가 delete할 때, 이 메소드를 호출 (상위에서 soft delete한 경우에만 카드도 soft delete를 실행)
      */
     public void deleteAllComment(List<Long> cardIds) {
-        commentRepository.SoftDelete(cardIds);
+        commentRepository.softDelete(cardIds);
     }
 
     /**
