@@ -12,6 +12,8 @@ import com.b3.ddarelro.domain.comment.service.*;
 import com.b3.ddarelro.domain.file.service.*;
 import com.b3.ddarelro.domain.user.entity.*;
 import com.b3.ddarelro.domain.user.service.*;
+import com.b3.ddarelro.domain.worker.entity.*;
+import com.b3.ddarelro.domain.worker.repository.*;
 import com.b3.ddarelro.global.exception.*;
 import java.time.*;
 import java.util.*;
@@ -30,8 +32,7 @@ public class CardService {
     private final CommentDeleteRestoreService commentDeleteRestoreService;
     private final FileDeleteRestoreService fileDeleteRestoreService;
     private final CheckListDeleteRestoreService checkListDeleteRestoreService;
-//    private final WorkerRepository workerRepository;
-
+    private final WorkerRepository workerRepository;
 
     @Transactional
     public CardCreateRes createCard(CardCreateReq req, User user) {
@@ -171,14 +172,23 @@ public class CardService {
     }
 
     //TODO 작업자 할당
-//    public List<CardWorkersRes> addWorkers(Long cardId, CardWorkersReq req, User user) {
-//        userService.findUser(user.getId());
-//        Column column = columnService.findColumn(req.columnId());
-//        Card card = findCard(cardId);
-//        //작업 할당은 팀장급? => 팀장인지 체크
-//
-//        return null;
-//    }
+    @Transactional
+    public CardWorkersRes setWorkers(CardWorkersReq req, Long userId) {
+        User user = userService.findUser(userId);
+        Card card = findCard(req.cardId());
+
+        Optional<Worker> checkWorkerName = workerRepository.findByWorkerNameAndCard(
+            req.workerName(), card);
+
+        //배정되지 않은 작업자면 username으로 Worker생성 후 저장
+        if (checkWorkerName.isEmpty()) {
+            setNewWorker(req, user, card);
+        }
+        //이미 배정되어 있는 작업자면 삭제
+        checkWorkerName.ifPresent(workerRepository::delete);
+
+        return CardWorkersRes.builder().msg("작업배정이 업데이트 되었습니다!").build();
+    }
 
     private static LocalDate getDueDate(CardDueDateReq req) {
         int year = req.year();
@@ -188,6 +198,21 @@ public class CardService {
 
         dueDate = LocalDate.of(year, month, day);
         return dueDate;
+    }
+
+    private void setNewWorker(CardWorkersReq req, User user, Card card) {
+        Worker newWorker = Worker.builder()
+            .workerName(req.workerName())
+            .user(user)
+            .card(card)
+            .isAssigned(Assignment.ASSIGNED)
+            .build();
+        //등록할 작업자가 사용자로 등록되어 있는지 검증
+        if (!req.workerName()
+            .equals(userService.findUser(newWorker.getUser().getId()).getUsername())) {
+            throw new GlobalException(CardErrorCode.NOT_EXIST_WORKER);
+        }
+        workerRepository.save(newWorker);
     }
 
     private List<Long> findCardIdsByColumn(Long cardId, Column column) {

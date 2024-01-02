@@ -70,9 +70,10 @@ public class CardController {
     }
 
     //TODO 카드 작업자 할당
-//    @PutMapping("/{cardId}")
-//    public ResponseEntity<List<CardWorkersRes>> addWorkers(@PathVariable Long cardId,
-//        @RequestBody CardWorkersReq req, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-//        return ResponseEntity.ok().body(cardService.addWorkers(cardId, req, userDetails.getUser()));
-//    }
+    @PutMapping("/workers")
+    public ResponseEntity<CardWorkersRes> setWorkers(@RequestBody CardWorkersReq req,
+        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.ok()
+            .body(cardService.setWorkers(req, userDetails.getUser().getId()));
+    }
 }
