@@ -24,7 +24,7 @@ public class TokenProvider {
     public static final String ACCESS_TOKEN_HEADER = "AccessToken";
     public static final String REFRESH_TOKEN_HEADER = "RefreshToken";
     public static final String BEARER_PREFIX = "Bearer ";
-    public final long ACCESS_TOKEN_TIME = 30 * 1000L;
+    public final long ACCESS_TOKEN_TIME = 60 * 60 * 1000L;
     public final long REFRESH_TOKEN_TIME = 60 * 60 * 1000L * 24 * 14;
 
     @Value("${jwt.secret.key}")
