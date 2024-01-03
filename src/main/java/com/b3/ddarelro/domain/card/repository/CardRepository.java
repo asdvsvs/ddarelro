@@ -1,8 +1,10 @@
 package com.b3.ddarelro.domain.card.repository;
 
-import com.b3.ddarelro.domain.card.entity.*;
-import java.util.*;
-import org.springframework.data.jpa.repository.*;
+import com.b3.ddarelro.domain.card.entity.Card;
+import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 
 public interface CardRepository extends JpaRepository<Card, Long> {
 
@@ -21,6 +23,7 @@ public interface CardRepository extends JpaRepository<Card, Long> {
     void restoreAll(List<Long> columnIds);
 
     @Modifying
-    @Query("update Card c set c.priority = c.priority + :moveDirection where c.priority between :start and :end")
-    void moveAnotherCards(Long start, Long end, Long moveDirection);
+    @Query("update Card c set c.priority = c.priority + :moveDirection "
+        + "where c.column.id= :columnId and c.priority between :start and :end")
+    void moveAnotherCards(Long start, Long end, Long moveDirection, Long columnId);
 }

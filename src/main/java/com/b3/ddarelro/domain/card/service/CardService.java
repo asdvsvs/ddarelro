@@ -1,27 +1,47 @@
 package com.b3.ddarelro.domain.card.service;
 
-import com.b3.ddarelro.domain.card.dto.request.*;
-import com.b3.ddarelro.domain.card.dto.response.*;
-import com.b3.ddarelro.domain.card.entity.*;
-import com.b3.ddarelro.domain.card.exception.*;
-import com.b3.ddarelro.domain.card.repository.*;
-import com.b3.ddarelro.domain.checklist.service.*;
-import com.b3.ddarelro.domain.column.entity.*;
-import com.b3.ddarelro.domain.column.service.*;
-import com.b3.ddarelro.domain.comment.service.*;
-import com.b3.ddarelro.domain.file.service.*;
-import com.b3.ddarelro.domain.user.entity.*;
-import com.b3.ddarelro.domain.user.service.*;
-import com.b3.ddarelro.domain.worker.*;
-import com.b3.ddarelro.domain.worker.entity.*;
-import com.b3.ddarelro.domain.worker.repository.*;
-import com.b3.ddarelro.global.exception.*;
-import java.time.*;
-import java.util.*;
-import java.util.stream.*;
-import lombok.*;
-import org.springframework.stereotype.*;
-import org.springframework.transaction.annotation.*;
+import com.b3.ddarelro.domain.card.dto.request.CardCreateReq;
+import com.b3.ddarelro.domain.card.dto.request.CardDeleteReq;
+import com.b3.ddarelro.domain.card.dto.request.CardDueDateReq;
+import com.b3.ddarelro.domain.card.dto.request.CardListReq;
+import com.b3.ddarelro.domain.card.dto.request.CardModifyReq;
+import com.b3.ddarelro.domain.card.dto.request.CardMoveReq;
+import com.b3.ddarelro.domain.card.dto.request.CardReq;
+import com.b3.ddarelro.domain.card.dto.request.CardRestoreReq;
+import com.b3.ddarelro.domain.card.dto.request.CardWorkersReq;
+import com.b3.ddarelro.domain.card.dto.response.CardCreateRes;
+import com.b3.ddarelro.domain.card.dto.response.CardDeleteRes;
+import com.b3.ddarelro.domain.card.dto.response.CardDueDateRes;
+import com.b3.ddarelro.domain.card.dto.response.CardListRes;
+import com.b3.ddarelro.domain.card.dto.response.CardModifyRes;
+import com.b3.ddarelro.domain.card.dto.response.CardMoveRes;
+import com.b3.ddarelro.domain.card.dto.response.CardRes;
+import com.b3.ddarelro.domain.card.dto.response.CardRestoreRes;
+import com.b3.ddarelro.domain.card.dto.response.CardWorkersRes;
+import com.b3.ddarelro.domain.card.entity.Card;
+import com.b3.ddarelro.domain.card.exception.CardErrorCode;
+import com.b3.ddarelro.domain.card.repository.CardRepository;
+import com.b3.ddarelro.domain.checklist.service.CheckListDeleteRestoreService;
+import com.b3.ddarelro.domain.column.entity.Column;
+import com.b3.ddarelro.domain.column.service.ColumnService;
+import com.b3.ddarelro.domain.comment.service.CommentDeleteRestoreService;
+import com.b3.ddarelro.domain.file.service.FileDeleteRestoreService;
+import com.b3.ddarelro.domain.user.entity.User;
+import com.b3.ddarelro.domain.user.service.UserService;
+import com.b3.ddarelro.domain.worker.WorkersRes;
+import com.b3.ddarelro.domain.worker.entity.Assignment;
+import com.b3.ddarelro.domain.worker.entity.Worker;
+import com.b3.ddarelro.domain.worker.repository.WorkerRepository;
+import com.b3.ddarelro.global.exception.GlobalException;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -113,12 +133,15 @@ public class CardService {
         Column column = columnService.findColumn(req.columnId());
 
         Card card = findCard(cardId);
-        if (req.anotherColumnId() != null) {
+        if (!Objects.equals(card.getColumn().getId(), req.columnId())) {
+            throw new GlobalException(CardErrorCode.CANNOT_BE_SAME_COLUMN);
+        }
+        if (!Objects.equals(req.anotherColumnId(), req.columnId())) {
             //현재컬럼내 카드들 마지막 순위로
             Long spotInSameColumn = cardRepository.countByColumnId(column.getId());
-            card.moveSpot(spotInSameColumn);
             //나머지 카드들 순위순 정리
-            orderByPriorityOtherCards(card, spotInSameColumn);
+            orderByPriorityOtherCards(card, spotInSameColumn, column.getId());
+            card.moveSpot(spotInSameColumn);
             //다른 컬럼으로 카드 이동
             Column anotherColumn = columnService.findColumn(req.anotherColumnId());
             card.changeColumn(anotherColumn);
@@ -137,15 +160,15 @@ public class CardService {
         if (Objects.equals(card.getPriority(), spot)) {
             throw new GlobalException(CardErrorCode.CANNOT_BE_SAME_PRIORITY);
         }
-        orderByPriorityOtherCards(card, spot);
+        orderByPriorityOtherCards(card, spot, columnId);
         card.moveSpot(spot);
     }
 
-    private void orderByPriorityOtherCards(Card card, Long spotInSameColumn) {
+    private void orderByPriorityOtherCards(Card card, Long spotInSameColumn, Long columnId) {
         Long moveDirection = card.getPriority() > spotInSameColumn ? 1L : -1L;
         Long start = moveDirection == -1L ? card.getPriority() : spotInSameColumn;
         Long end = moveDirection == -1L ? spotInSameColumn : card.getPriority();
-        cardRepository.moveAnotherCards(start, end, moveDirection);
+        cardRepository.moveAnotherCards(start, end, moveDirection, columnId);
     }
 
     private Long defineSpot(Long spot, Long columnId) {
